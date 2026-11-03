@@ -1,0 +1,83 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env: {POSTGRES_USER: argus, POSTGRES_PASSWORD: argus, POSTGRES_DB: argus}
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U argus" --health-interval 5s --health-timeout 3s --health-retries 10
+      qdrant:
+        image: qdrant/qdrant:v1.12.4
+        ports: ["6333:6333"]
+    env:
+      PGHOST: localhost
+      PGPORT: "5432"
+      POSTGRES_PASSWORD: argus
+      SKIP_WEB: "1"  # the web job covers the frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: "17"}
+      - uses: astral-sh/setup-uv@v5
+        with: {enable-cache: true}
+      - name: Cache Hugging Face models
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-minilm-bge-reranker-base
+      - uses: azure/setup-helm@v4
+      - run: uv sync --python 3.12
+      - name: Unit and integration tests
+        run: scripts/test.sh
+      - name: Regression gate (classifier, retrieval, agent eval results)
+        run: scripts/ci_gate.sh
+        env:
+          PGDATABASE: argus_ci
+      - name: Upload eval summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with: {name: eval-latest, path: eval/latest.json, if-no-files-found: ignore}
+
+  web:
+    runs-on: ubuntu-latest
+    defaults: {run: {working-directory: web}}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: "24", cache: npm, cache-dependency-path: web/package-lock.json}
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npx eslint .
+      - run: npm run build
+      - name: Static demo site still builds
+        run: ../scripts/build_static.sh /argus-aiops
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Lint every client release
+        run: |
+          for c in acme globex initech; do helm lint deploy/helm/argus -f deploy/helm/values-$c.yaml; done
+      - name: Validate Terraform
+        working-directory: deploy/terraform
+        run: |
+          terraform init -backend=false -input=false
+          terraform fmt -check -recursive
+          terraform validate
+      - name: Build the images (no push)
+        run: |
+          docker build -t argus-api:dev -f Dockerfile.api .
+          docker build -t argus-web:dev web

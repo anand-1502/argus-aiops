@@ -1,0 +1,19 @@
+{
+ "label": "baseline-1",
+ "at": "2026-10-30T06:38:43+00:00",
+ "model": "qwen3.5:4b",
+ "source_hash": "f0fc64fedd62351b",
+ "metrics": {
+  "n_incidents": 30,
+  "n_crashed": 0,
+  "runbook_accuracy": 0.9667,
+  "verified_rate": 0.9667,
+  "signature_cited_rate": 0.9,
+  "first_draft_rate": 0.9667,
+  "plan_fallback_rate": 0.0,
+  "mean_seconds": 78.9,
+  "deepeval_faithfulness_n": 8,
+  "deepeval_faithfulness": 0.6446,
+  "ragas_faithfulness_n": 0
+ }
+}

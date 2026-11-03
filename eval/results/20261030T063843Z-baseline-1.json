@@ -1,0 +1,1290 @@
+{
+ "label": "baseline-1",
+ "at": "2026-10-30T06:38:43+00:00",
+ "model": "qwen3.5:4b",
+ "source_hash": "f0fc64fedd62351b",
+ "metrics": {
+  "n_incidents": 30,
+  "n_crashed": 0,
+  "runbook_accuracy": 0.9667,
+  "verified_rate": 0.9667,
+  "signature_cited_rate": 0.9,
+  "first_draft_rate": 0.9667,
+  "plan_fallback_rate": 0.0,
+  "mean_seconds": 78.9,
+  "deepeval_faithfulness_n": 8,
+  "deepeval_faithfulness": 0.6446,
+  "ragas_faithfulness_n": 0
+ },
+ "incidents": [
+  {
+   "block_id": "blk_-1038022846623317329",
+   "expected_runbook": "RB-001",
+   "first_ts": "2008-11-11T04:39:26+00:00",
+   "last_ts": "2008-11-11T04:47:41+00:00",
+   "n_events": 20,
+   "signature_line": "Unexpected error trying to delete block blk_-1038022846623317329. BlockInfo not found in volumeMap.",
+   "split": "seeded",
+   "error": null,
+   "seconds": 87.3,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "judge": {
+    "deepeval_faithfulness": 0.8333333333333334,
+    "ragas_faithfulness": null,
+    "errors": [
+     "ragas_faithfulness: RagasOutputParserException: The output parser failed to parse the output including retries."
+    ]
+   },
+   "postmortem": {
+    "root_cause": "DataNode deletion error due to missing volume map entry for block blk_-1038022846623317329",
+    "runbook_id": "RB-001",
+    "summary": "A DataNode reported an unexpected error while attempting to delete a replica of block blk_-1038022846623317329 because the BlockInfo was not found in its volumeMap. The block write completed successfully across three replicas, but the subsequent deletion process triggered this error on one node.",
+    "timeline": [
+     "Block blk_-1038022846623317329 allocated and received by three DataNodes (blk_-1038022846623317329#1, blk_-1038022846623317329#2)",
+     "Block write completed with all replicas added to blockMap at 04:39:47 (blk_-1038022846623317329#5, blk_-1038022846623317329#6, blk_-1038022846623317329#7)",
+     "DataNode attempted to delete block replica but failed due to missing volume map entry (blk_-1038022846623317329#18)",
+     "NameNode successfully deleted the block from invalidSet for all replicas at 04:42:58 (blk_-1038022846623317329#14, blk_-1038022846623317329#15, blk_-1038022846623317329#16)",
+     "DataNode eventually deleted the file after retrying (blk_-1038022846623317329#19)"
+    ],
+    "recommended_actions": [
+     "Monitor for repeated occurrences of this error on the same block ID to determine if a volume map rebuild is needed",
+     "Review DataNode logs for any preceding 'Deleting block' entries or restart events related to this timeframe",
+     "Verify that no other blocks are experiencing similar deletion failures simultaneously"
+    ],
+    "key_evidence_id": "blk_-1038022846623317329#18",
+    "key_evidence_quote": "Unexpected error trying to delete block blk_-1038022846623317329. BlockInfo not found in volumeMap.",
+    "citations": [
+     "blk_-1038022846623317329#18",
+     "RB-001#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-1000723577943457888",
+   "expected_runbook": "RB-002",
+   "first_ts": "2008-11-11T08:17:14+00:00",
+   "last_ts": "2008-11-11T08:17:18+00:00",
+   "n_events": 4,
+   "signature_line": "writeBlock blk_-1000723577943457888 received exception java.io.IOException: Could not read from stream",
+   "split": "seeded",
+   "error": null,
+   "seconds": 47.1,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Write pipeline failure due to a connection loss during block write, as indicated by the IOException: Could not read from stream.",
+    "runbook_id": "RB-002",
+    "summary": "The HDFS DataNode failed to complete the write of block blk_-1000723577943457888. The write pipeline lost connection mid-stream, resulting in a failure to finalize the block. This occurred shortly after receiving multiple data chunks from an upstream source.",
+    "timeline": [
+     "Block allocation initiated at 08:17:14 based on [blk_-1000723577943457888#1]",
+     "Data received from /10.251.30.179:42625 at 08:17:16 based on [blk_-1000723577943457888#3]",
+     "Write pipeline failed with IOException: Could not read from stream at 08:17:18 based on [blk_-1000723577943457888#4]"
+    ],
+    "recommended_actions": [
+     "Investigate the upstream node (10.251.30.179) for crashes, restarts, or long GC pauses around 08:17.",
+     "Check network stability and timeouts between the pipeline nodes at the time of failure.",
+     "Monitor write exceptions across other DataNodes to rule out a broader network fault."
+    ],
+    "key_evidence_id": "blk_-1000723577943457888#4",
+    "key_evidence_quote": "Could not read from stream",
+    "citations": [
+     "blk_-1000723577943457888#4",
+     "RB-002#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-1009207079038502874",
+   "expected_runbook": "RB-003",
+   "first_ts": "2008-11-10T01:14:23+00:00",
+   "last_ts": "2008-11-10T10:36:33+00:00",
+   "n_events": 33,
+   "signature_line": "BLOCK* ask 10.251.122.79:50010 to replicate blk_-1009207079038502874 to datanode(s) 10.251.214.225:50010",
+   "split": "seeded",
+   "error": null,
+   "seconds": 82.4,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Unplanned re-replication activity triggered by NameNode asking DataNodes to replicate a block below its target count.",
+    "runbook_id": "RB-003",
+    "summary": "The cluster experienced unplanned re-replication for block blk_-1009207079038502874, where the NameNode initiated replication transfers to bring the block count back to target. This activity was followed by multiple write exceptions and eventual deletion of orphan replicas from several DataNodes.",
+    "timeline": [
+     "2008-11-10T01:14:50+00:00 NameNode asks 10.251.122.79:50010 to replicate blk_-1009207079038502874 (blk_-1009207079038502874#13)",
+     "2008-11-10T01:14:52+00:00 Thread starts to transfer block blk_-1009207079038502874 (blk_-1009207079038502874#15)",
+     "2008-11-10T01:14:59+00:00 Block transferred and received by 10.251.214.225:50010 (blk_-1009207079038502874#17)",
+     "2008-11-10T02:55:12+00:00 Write exception occurs on 10.250.11.100:50010 serving the block (blk_-1009207079038502874#21)",
+     "2008-11-10T10:30:30+00:00 Block added to invalidSet on multiple DataNodes after deletion (blk_-1009207079038502874#28-30)"
+    ],
+    "recommended_actions": [
+     "Let the replication monitor finish transferring the block.",
+     "Monitor for further write exceptions and confirm the block returns to its target replication count.",
+     "Check if DataNodes restarted recently or if there were earlier write exceptions for the same block."
+    ],
+    "key_evidence_id": "blk_-1009207079038502874#13",
+    "key_evidence_quote": "ask 10.251.122.79:50010 to replicate blk_-1009207079038502874 to datanode(s) 10.251.214.225:50010",
+    "citations": [
+     "blk_-1009207079038502874#13",
+     "RB-003#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-1001299764911418845",
+   "expected_runbook": "RB-004",
+   "first_ts": "2008-11-09T21:16:57+00:00",
+   "last_ts": "2008-11-10T10:50:48+00:00",
+   "n_events": 25,
+   "signature_line": "BLOCK* NameSystem.addStoredBlock: addStoredBlock request received for blk_-1001299764911418845 on 10.251.106.10:50010 size 67108864 But it does not belong to any file.",
+   "split": "seeded",
+   "error": null,
+   "seconds": 94.0,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "judge": {
+    "deepeval_faithfulness": 0.8571428571428571,
+    "ragas_faithfulness": null,
+    "errors": [
+     "ragas_faithfulness: RagasOutputParserException: The output parser failed to parse the output including retries."
+    ]
+   },
+   "postmortem": {
+    "root_cause": "Block blk_-1001299764911418845 was reported as belonging to no file, indicating metadata inconsistency or a failed write job.",
+    "runbook_id": "RB-004",
+    "summary": "A block was successfully created and replicated across multiple DataNodes, but later reports indicated it did not belong to any file. The block was eventually added to the invalidSet and deleted from the filesystem. This suggests a failure in the writing job or metadata tracking that resulted in an orphaned block report.",
+    "timeline": [
+     "2008-11-09T21:16:57+00:00: Block blk_-1001299764911418845 was allocated and received from multiple DataNodes (blk_-1001299764911418845#1, blk_-1001299764911418845#2).",
+     "2008-11-09T21:17:46+00:00: Block was added to the blockMap by multiple DataNodes (blk_-1001299764911418845#5, blk_-1001299764911418845#8).",
+     "2008-11-09T21:41:34+00:00: A rare warning occurred where a DataNode reported an exception while serving the block (blk_-1001299764911418845#14).",
+     "2008-11-10T10:31:09+00:00: The block was added to the invalidSet by multiple DataNodes (blk_-1001299764911418845#18, blk_-1001299764911418845#19).",
+     "2008-11-10T10:46:29+00:00: A rare log entry confirmed the block did not belong to any file (blk_-1001299764911418845#23)."
+    ],
+    "recommended_actions": [
+     "Investigate writing jobs around 2008-11-09T21:16:57+00:00 to check for cancellations or failures (RB-004#Checks).",
+     "Review NameNode logs for other blocks added to invalidSet during the same period to assess scope of metadata loss (RB-004#Checks).",
+     "Monitor for redundant addStoredBlock requests and DataNode re-registrations to rule out RPC queue issues (RB-005#Checks)."
+    ],
+    "key_evidence_id": "blk_-1001299764911418845#23",
+    "key_evidence_quote": "addStoredBlock request received for blk_-1001299764911418845 on 10.251.106.10:50010 size 67108864 But it does not belong to any file.",
+    "citations": [
+     "blk_-1001299764911418845#23",
+     "RB-004#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-1014865944005847876",
+   "expected_runbook": "RB-005",
+   "first_ts": "2008-11-09T23:37:21+00:00",
+   "last_ts": "2008-11-10T10:39:08+00:00",
+   "n_events": 20,
+   "signature_line": "BLOCK* NameSystem.addStoredBlock: Redundant addStoredBlock request received for blk_-1014865944005847876 on 10.251.123.195:50010 size 67108864",
+   "split": "seeded",
+   "error": null,
+   "seconds": 92.0,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Redundant addStoredBlock request received for blk_-1014865944005847876 on 10.251.123.195:50010 size 67108864",
+    "runbook_id": "RB-005",
+    "summary": "A block report for blk_-1014865944005847876 was received multiple times from the same DataNode, 10.251.123.195:50010. The NameNode logged a warning indicating this redundant request occurred after it had already recorded the replica for that block.",
+    "timeline": [
+     "2008-11-09T23:37:21+00:00 Block blk_-1014865944005847876 allocated and received from 10.251.194.245 [blk_-1014865944005847876#2]",
+     "2008-11-09T23:37:21+00:00 Block blk_-1014865944005847876 received from 10.251.123.195 [blk_-1014865944005847876#3]",
+     "2008-11-09T23:37:49+00:00 Block blk_-1014865944005847876 received from 10.251.123.195 again [blk_-1014865944005847876#10]",
+     "2008-11-09T23:37:53+00:00 Redundant addStoredBlock request received for blk_-1014865944005847876 on 10.251.123.195:50010 [blk_-1014865944005847876#14]",
+     "2008-11-10T10:31:33+00:00 Block blk_-1014865944005847876 added to invalidSet [blk_-1014865944005847876#15]",
+     "2008-11-10T10:35:31+00:00 Block blk_-1014865944005847876 deleted from file system [blk_-1014865944005847876#18]"
+    ],
+    "recommended_actions": [
+     "Monitor NameNode RPC latency around the time of block reports to identify potential queue backlogs.",
+     "Check whether the DataNode 10.251.123.195 restarted or re-registered recently before the redundant report."
+    ],
+    "key_evidence_id": "blk_-1014865944005847876#14",
+    "key_evidence_quote": "Redundant addStoredBlock request received for blk_-1014865944005847876 on 10.251.123.195:50010 size 67108864",
+    "citations": [
+     "blk_-1014865944005847876#14",
+     "RB-005#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-1018884555287540953",
+   "expected_runbook": "RB-006",
+   "first_ts": "2008-11-09T21:22:04+00:00",
+   "last_ts": "2008-11-10T10:36:02+00:00",
+   "n_events": 23,
+   "signature_line": "Receiving empty packet for block blk_-1018884555287540953",
+   "split": "seeded",
+   "error": null,
+   "seconds": 72.9,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Empty packet in the write pipeline caused by a client closing or flushing the stream without data after an aborted write.",
+    "runbook_id": "RB-006",
+    "summary": "A DataNode received an empty packet during the write of block blk_-1018884555287540953, which was subsequently marked as invalid and deleted. The block was successfully written to multiple replicas before being flagged for deletion due to the empty packet anomaly.",
+    "timeline": [
+     "2008-11-09T21:22:06+00:00: (RARE) Empty packet received for block blk_-1018884555287540953 [blk_-1018884555287540953#6]",
+     "2008-11-09T21:22:06+00:00: PacketResponder 0 terminated due to the empty packet [blk_-1018884555287540953#7]",
+     "2008-11-09T21:22:07+00:00: Block blk_-1018884555287540953 added to invalidSet [blk_-1018884555287540953#18]",
+     "2008-11-10T10:36:02+00:00: Block file deleted from disk [blk_-1018884555287540953#23]"
+    ],
+    "recommended_actions": [
+     "Replace or exclude the slow node from pipelines, and fix the disk or network cause.",
+     "Check the client that opened the pipeline and whether the write later completed.",
+     "Look for pipeline errors before or after the empty packet."
+    ],
+    "key_evidence_id": "blk_-1018884555287540953#6",
+    "key_evidence_quote": "Receiving empty packet for block blk_-1018884555287540953",
+    "citations": [
+     "blk_-1018884555287540953#6",
+     "RB-006#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_8761834957091365116",
+   "expected_runbook": "RB-001",
+   "first_ts": "2008-11-10T14:47:06+00:00",
+   "last_ts": "2008-11-10T21:06:52+00:00",
+   "n_events": 20,
+   "signature_line": "Unexpected error trying to delete block blk_8761834957091365116. BlockInfo not found in volumeMap.",
+   "split": "heldout",
+   "error": null,
+   "seconds": 76.8,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "DataNode deletion failure due to missing block info in volumeMap, likely caused by a late or duplicate delete command after the replica was already removed.",
+    "runbook_id": "RB-001",
+    "summary": "The DataNode encountered an unexpected error while attempting to delete block blk_8761834957091365116 because the BlockInfo was not found in its volumeMap. This occurred after the block had been successfully written and replicated across multiple nodes, as evidenced by the successful `Received block` and `PacketResponder terminating` logs. The NameNode subsequently marked the block as invalid on all three DataNodes, triggering a cleanup sequence that resulted in the deletion error.",
+    "timeline": [
+     "2008-11-10T14:47:06+00:00 Block allocation and initial receiving logs observed [blk_8761834957091365116#1]",
+     "2008-11-10T14:47:46+00:00 All replicas successfully received and PacketResponders terminated, confirming write completion [blk_8761834957091365116#9]",
+     "2008-11-10T21:01:26+00:00 NameNode added block to invalidSet on all three DataNodes, initiating deletion [blk_8761834957091365116#14]",
+     "2008-11-10T21:06:52+00:00 Unexpected error logged during block deletion due to missing volumeMap entry [blk_8761834957091365116#20]"
+    ],
+    "recommended_actions": [
+     "Monitor the system for repeated occurrences of this specific error on distinct blocks, which may indicate volume map corruption.",
+     "If the error persists for hours or affects many blocks, restart the affected DataNode to rebuild its volume map and run a block report.",
+     "Verify that no duplicate or late delete commands were sent by the NameNode after the replicas were already removed."
+    ],
+    "key_evidence_id": "blk_8761834957091365116#20",
+    "key_evidence_quote": "Unexpected error trying to delete block blk_8761834957091365116. BlockInfo not found in volumeMap.",
+    "citations": [
+     "blk_8761834957091365116#20",
+     "RB-001#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_8778297835340841956",
+   "expected_runbook": "RB-001",
+   "first_ts": "2008-11-10T21:25:01+00:00",
+   "last_ts": "2008-11-10T22:10:41+00:00",
+   "n_events": 20,
+   "signature_line": "Unexpected error trying to delete block blk_8778297835340841956. BlockInfo not found in volumeMap.",
+   "split": "heldout",
+   "error": null,
+   "seconds": 67.8,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "judge": {
+    "deepeval_faithfulness": 0.5,
+    "ragas_faithfulness": null,
+    "errors": [
+     "ragas_faithfulness: RagasOutputParserException: The output parser failed to parse the output including retries."
+    ]
+   },
+   "postmortem": {
+    "root_cause": "DataNode deletion failure due to missing volume map entry for block blk_8778297835340841956",
+    "runbook_id": "RB-001",
+    "summary": "The DataNode attempted to delete a replica of block blk_8778297835340841956 but failed because the BlockInfo was not found in its volumeMap. This occurred shortly after the NameNode marked the block as invalid and initiated deletion across multiple replicas.",
+    "timeline": [
+     "2008-11-10T21:25:01+00:00: Block blk_8778297835340841956 allocated and receiving started (blk_8778297835340841956#1)",
+     "2008-11-10T21:25:23+00:00: All three replicas received the block and PacketResponder terminated (blk_8778297835340841956#8, blk_8778297835340841956#10, blk_8778297835340841956#12)",
+     "2008-11-10T22:06:44+00:00: NameNode added the block to invalidSet for all three replicas (blk_8778297835340841956#14, blk_8778297835340841956#15, blk_8778297835340841956#16)",
+     "2008-11-10T22:09:23+00:00: DataNode logged unexpected error during deletion due to missing volume map entry (blk_8778297835340841956#18)",
+     "2008-11-10T22:10:11+00:00: DataNode successfully deleted the remaining replica file (blk_8778297835340841956#19)"
+    ],
+    "recommended_actions": [
+     "Monitor for repeated occurrences of this error on the same block ID, which may indicate volume map corruption",
+     "Restart the DataNode to rebuild its volume map if the error persists for hours",
+     "Run a block report after restart to ensure consistency"
+    ],
+    "key_evidence_id": "blk_8778297835340841956#18",
+    "key_evidence_quote": "Unexpected error trying to delete block blk_8778297835340841956. BlockInfo not found in volumeMap.",
+    "citations": [
+     "blk_8778297835340841956#18",
+     "RB-001#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_5786911754239753216",
+   "expected_runbook": "RB-001",
+   "first_ts": "2008-11-11T05:12:29+00:00",
+   "last_ts": "2008-11-11T07:59:21+00:00",
+   "n_events": 20,
+   "signature_line": "Unexpected error trying to delete block blk_5786911754239753216. BlockInfo not found in volumeMap.",
+   "split": "heldout",
+   "error": null,
+   "seconds": 73.3,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "DataNode deletion error due to missing block info in volumeMap, likely caused by a late or duplicate delete command after the replica was already removed.",
+    "runbook_id": "RB-001",
+    "summary": "A DataNode reported an unexpected error while attempting to delete block blk_5786911754239753216 because the BlockInfo was not found in its volumeMap. The block had been successfully written and received by multiple replicas, but a subsequent deletion attempt failed due to stale state information.",
+    "timeline": [
+     "2008-11-11T05:12:29+00:00: Block blk_5786911754239753216 received on /10.251.66.3 (blk_5786911754239753216#1)",
+     "2008-11-11T05:13:05+00:00: All three replicas for block blk_5786911754239753216 were added to the blockMap (blk_5786911754239753216#5-7)",
+     "2008-11-11T07:56:26+00:00: NameNode deleted replicas of block blk_5786911754239753216 from invalidSet (blk_5786911754239753216#14-16)",
+     "2008-11-11T07:59:21+00:00: DataNode logged unexpected error during block deletion due to missing volumeMap entry (blk_5786911754239753216#20)"
+    ],
+    "recommended_actions": [
+     "Monitor for repeated occurrences of this error across distinct blocks, which may indicate volume map corruption.",
+     "Restart the DataNode to rebuild its volume map if the same block ID repeats for hours.",
+     "Run a block report after restarting the DataNode to ensure consistency."
+    ],
+    "key_evidence_id": "blk_5786911754239753216#20",
+    "key_evidence_quote": "Unexpected error trying to delete block blk_5786911754239753216. BlockInfo not found in volumeMap.",
+    "citations": [
+     "blk_5786911754239753216#20",
+     "RB-001#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_7963243402010652895",
+   "expected_runbook": "RB-001",
+   "first_ts": "2008-11-10T23:06:39+00:00",
+   "last_ts": "2008-11-11T04:49:33+00:00",
+   "n_events": 20,
+   "signature_line": "Unexpected error trying to delete block blk_7963243402010652895. BlockInfo not found in volumeMap.",
+   "split": "heldout",
+   "error": null,
+   "seconds": 70.1,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "DataNode deletion error due to missing block replica in volumeMap, likely caused by a late or duplicate invalidate command after the write completed.",
+    "runbook_id": "RB-001",
+    "summary": "A DataNode reported an unexpected error while attempting to delete block blk_7963243402010652895 because the BlockInfo was not found in its volumeMap. The block write completed successfully with three replicas added, but a subsequent delete operation failed due to a stale or duplicate invalidate command sent by the NameNode after the replica had already been removed.",
+    "timeline": [
+     "2008-11-10T23:06:39+00:00: Block blk_7963243402010652895 allocated (blk_7963243402010652895#1)",
+     "2008-11-10T23:07:14+00:00: All three replicas received and added to blockMap (blk_7963243402010652895#5, #6, #7)",
+     "2008-11-11T04:43:51+00:00: NameNode sent delete commands to all replicas (blk_7963243402010652895#14, #15, #16)",
+     "2008-11-11T04:47:45+00:00: DataNode logged unexpected error during deletion (blk_7963243402010652895#19)"
+    ],
+    "recommended_actions": [
+     "Monitor for repeated occurrences of this specific error message to determine if a volume map rebuild is needed.",
+     "Verify that no other blocks are affected by checking the invalidSet entries in the NameNode logs.",
+     "If the error persists across multiple blocks or restarts, consider restarting the DataNode to rebuild its volume map."
+    ],
+    "key_evidence_id": "blk_7963243402010652895#19",
+    "key_evidence_quote": "Unexpected error trying to delete block blk_7963243402010652895. BlockInfo not found in volumeMap.",
+    "citations": [
+     "blk_7963243402010652895#19",
+     "RB-001#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_2465764068194463148",
+   "expected_runbook": "RB-002",
+   "first_ts": "2008-11-09T21:06:22+00:00",
+   "last_ts": "2008-11-09T21:06:26+00:00",
+   "n_events": 4,
+   "signature_line": "writeBlock blk_2465764068194463148 received exception java.io.IOException: Could not read from stream",
+   "split": "heldout",
+   "error": null,
+   "seconds": 48.0,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Write pipeline failure caused by a DataNode losing connection to the upstream writer mid-write.",
+    "runbook_id": "RB-002",
+    "summary": "The write of block blk_2465764068194463148 failed after receiving data from two sources, with the final write operation throwing an IOException indicating a stream read failure.",
+    "timeline": [
+     "Block allocation and initial reception at 21:06:22 based on blk_2465764068194463148#1",
+     "Continued data reception from two different source addresses between 21:06:22 and 21:06:23 based on blk_2465764068194463148#2 and blk_2465764068194463148#3",
+     "Final write operation failed with a stream read exception at 21:06:26 based on blk_2465764068194463148#4"
+    ],
+    "recommended_actions": [
+     "Investigate the upstream DataNode (10.251.127.47) for crashes, restarts, or long GC pauses around 21:06.",
+     "Check network stability and timeouts between the pipeline nodes at the time of the failure.",
+     "Review logs on other DataNodes to see if a burst of similar write exceptions occurred, indicating a potential network fault."
+    ],
+    "key_evidence_id": "blk_2465764068194463148#4",
+    "key_evidence_quote": "Could not read from stream",
+    "citations": [
+     "blk_2465764068194463148#4",
+     "RB-002#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-400148118409627480",
+   "expected_runbook": "RB-002",
+   "first_ts": "2008-11-10T21:23:32+00:00",
+   "last_ts": "2008-11-10T21:23:36+00:00",
+   "n_events": 4,
+   "signature_line": "writeBlock blk_-400148118409627480 received exception java.io.IOException: Could not read from stream",
+   "split": "heldout",
+   "error": null,
+   "seconds": 48.4,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "judge": {
+    "deepeval_faithfulness": 0.6666666666666666,
+    "ragas_faithfulness": null,
+    "errors": [
+     "ragas_faithfulness: skipped after repeated failures in this run"
+    ]
+   },
+   "postmortem": {
+    "root_cause": "Write pipeline failure due to a connection loss between the upstream writer and the DataNode, resulting in an IOException during block completion.",
+    "runbook_id": "RB-002",
+    "summary": "The write of block blk_-400148118409627480 failed because the DataNode could not read from the stream. The pipeline successfully received data from two sources but encountered an exception while finalizing the block, indicating a mid-write disconnection or timeout.",
+    "timeline": [
+     "Block allocation and initial receiving logs at 21:23:32 (blk_-400148118409627480#1, blk_-400148118409627480#2)",
+     "Continued data reception from a second source at 21:23:33 (blk_-400148118409627480#3)",
+     "Write pipeline failure occurred at 21:23:36 with an IOException (blk_-400148118409627480#4)"
+    ],
+    "recommended_actions": [
+     "Investigate the upstream writer and client logs for a crash, restart, or long GC pause around 21:23:36.",
+     "Check network stability between the pipeline nodes to rule out interruptions or timeouts.",
+     "Monitor write exceptions on other DataNodes to determine if this was an isolated event or part of a broader network fault."
+    ],
+    "key_evidence_id": "blk_-400148118409627480#4",
+    "key_evidence_quote": "Could not read from stream",
+    "citations": [
+     "blk_-400148118409627480#4",
+     "RB-002#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-8393677600696029949",
+   "expected_runbook": "RB-002",
+   "first_ts": "2008-11-11T10:37:54+00:00",
+   "last_ts": "2008-11-11T10:37:57+00:00",
+   "n_events": 4,
+   "signature_line": "writeBlock blk_-8393677600696029949 received exception java.io.IOException: Could not read from stream",
+   "split": "heldout",
+   "error": null,
+   "seconds": 57.5,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Write pipeline failure due to a connection loss during block blk_-8393677600696029949 write, as indicated by the IOException: Could not read from stream.",
+    "runbook_id": "RB-002",
+    "summary": "The DataNode failed to complete the write of block blk_-8393677600696029949, resulting in a partial write. The pipeline received the block from two sources but encountered an exception while writing it to disk. This event occurred at 10:37:57, shortly after receiving the block segments.",
+    "timeline": [
+     "Block blk_-8393677600696029949 was allocated at 10:37:54 [blk_-8393677600696029949#1].",
+     "The block was received from source /10.250.7.146:49969 at 10:37:54 [blk_-8393677600696029949#2].",
+     "The block was received from source /10.250.7.146:51845 at 10:37:54 [blk_-8393677600696029949#3].",
+     "The write pipeline failed with an IOException: Could not read from stream at 10:37:57 [blk_-8393677600696029949#4]."
+    ],
+    "recommended_actions": [
+     "Investigate the logs of the upstream DataNode (10.250.7.146) for a crash, restart, or long GC pause around 10:37.",
+     "Check network stability between the pipeline nodes to rule out a network interruption or timeout.",
+     "Monitor write_exceptions_per_min metrics to see if this was part of a burst of failures suggesting an overloaded node."
+    ],
+    "key_evidence_id": "blk_-8393677600696029949#4",
+    "key_evidence_quote": "Could not read from stream",
+    "citations": [
+     "blk_-8393677600696029949#4",
+     "RB-002#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-3872590798340718056",
+   "expected_runbook": "RB-002",
+   "first_ts": "2008-11-11T09:03:08+00:00",
+   "last_ts": "2008-11-11T09:03:12+00:00",
+   "n_events": 4,
+   "signature_line": "writeBlock blk_-3872590798340718056 received exception java.io.IOException: Could not read from stream",
+   "split": "heldout",
+   "error": null,
+   "seconds": 52.3,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Write pipeline failure due to a connection loss between the upstream writer and the DataNode, resulting in an IOException during block completion.",
+    "runbook_id": "RB-002",
+    "summary": "The HDFS write pipeline for block blk_-3872590798340718056 failed to complete successfully. While the block was allocated and data began receiving, the final step of writing the block encountered an exception indicating a loss of connection from the stream. This prevented the DataNode from sealing the block and reporting it as complete.",
+    "timeline": [
+     "2008-11-11T09:03:08+00:00 Block blk_-3872590798340718056 was allocated and receiving data from upstream nodes [blk_-3872590798340718056#1, blk_-3872590798340718056#2, blk_-3872590798340718056#3].",
+     "2008-11-11T09:03:12+00:00 The write pipeline failed to complete the block, generating an IOException [blk_-3872590798340718056#4]."
+    ],
+    "recommended_actions": [
+     "Investigate the upstream writer or client process around 2008-11-11T09:03:12+00:00 for a crash, restart, or long GC pause.",
+     "Check network stability and timeouts between the pipeline nodes at the time of the failure.",
+     "Monitor the DataNode logs for any signs of overload that might have caused the socket to be closed."
+    ],
+    "key_evidence_id": "blk_-3872590798340718056#4",
+    "key_evidence_quote": "Could not read from stream",
+    "citations": [
+     "blk_-3872590798340718056#4",
+     "RB-002#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-7918922585982249092",
+   "expected_runbook": "RB-003",
+   "first_ts": "2008-11-10T11:10:12+00:00",
+   "last_ts": "2008-11-10T21:03:37+00:00",
+   "n_events": 27,
+   "signature_line": "BLOCK* ask 10.250.11.100:50010 to replicate blk_-7918922585982249092 to datanode(s) 10.251.91.84:50010",
+   "split": "heldout",
+   "error": null,
+   "seconds": 88.4,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Unplanned re-replication activity triggered by NameNode reports of blocks below replication target, causing unnecessary data movement and subsequent orphan block cleanup.",
+    "runbook_id": "RB-003",
+    "summary": "The HDFS cluster experienced unplanned re-replication for block blk_-7918922585982249092, where the NameNode initiated replication to multiple DataNodes despite the block likely already meeting its target. This activity culminated in the block being reported as an orphan and subsequently deleted from all replicas after the original file was removed.",
+    "timeline": [
+     "11:10:12 - Block allocation and initial receiving logs (blk_-7918922585982249092#1, blk_-7918922585982249092#2)",
+     "11:10:15 - NameNode initiates replication to 10.251.91.84 (blk_-7918922585982249092#5)",
+     "11:10:18 - Thread starts and block is transmitted to 10.251.91.84 (blk_-7918922585982249092#15, blk_-7918922585982249092#17)",
+     "11:10:24 - Block file deleted from current directory (blk_-7918922585982249092#20)",
+     "21:01:52 - Block added to invalidSet on multiple DataNodes (blk_-7918922585982249092#22, blk_-7918922585982249092#23, blk_-7918922585982249092#24)",
+     "21:03:37 - Final deletion of block file (blk_-7918922585982249092#27)"
+    ],
+    "recommended_actions": [
+     "Monitor replication queue size and transfer rates to ensure they keep up with demand.",
+     "Check for earlier write exceptions for the same block as a potential root cause.",
+     "If transfers are slow, raise replication stream limits temporarily to prevent unnecessary re-replication.",
+     "Let the replication monitor finish without manual intervention unless reports persist."
+    ],
+    "key_evidence_id": "blk_-7918922585982249092#5",
+    "key_evidence_quote": "ask 10.250.11.100:50010 to replicate blk_-7918922585982249092 to datanode(s) 10.251.91.84:50010",
+    "citations": [
+     "blk_-7918922585982249092#5",
+     "RB-003#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-3293765112140934524",
+   "expected_runbook": "RB-003",
+   "first_ts": "2008-11-11T07:14:10+00:00",
+   "last_ts": "2008-11-11T09:12:49+00:00",
+   "n_events": 27,
+   "signature_line": "BLOCK* ask 10.251.39.64:50010 to replicate blk_-3293765112140934524 to datanode(s) 10.251.201.204:50010",
+   "split": "heldout",
+   "error": null,
+   "seconds": 95.5,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "judge": {
+    "deepeval_faithfulness": 0.8,
+    "ragas_faithfulness": null,
+    "errors": [
+     "ragas_faithfulness: skipped after repeated failures in this run"
+    ]
+   },
+   "postmortem": {
+    "root_cause": "Unplanned re-replication activity triggered by NameNode asking DataNodes to replicate a block below its target count, followed by orphan block reports causing file deletion.",
+    "runbook_id": "RB-003",
+    "summary": "The cluster experienced unplanned re-replication of block blk_-3293765112140934524, where the NameNode initiated replication requests and transfers due to the block falling below its target replication factor. This activity was followed by reports of the block as an orphan, leading to the deletion of multiple file replicas across different DataNodes.",
+    "timeline": [
+     "NameSystem.allocateBlock created blk_-3293765112140934524 (blk_-3293765112140934524#1)",
+     "Multiple DataNodes received the initial block transfer (blk_-3293765112140934524#2 through blk_-3293765112140934524#13)",
+     "NameSystem asked 10.251.39.64:50010 to replicate the block (blk_-3293765112140934524#14)",
+     "Replication transfer started and completed successfully (blk_-3293765112140934524#15 through blk_-3293765112140934524#19)",
+     "NameSystem reported the block as an orphan to multiple DataNodes, triggering file deletion (blk_-3293765112140934524#22 through blk_-3293765112140934524#27)"
+    ],
+    "recommended_actions": [
+     "Let the replication monitor finish as per RB-003#Fix",
+     "Monitor for further orphan block reports to confirm if manual intervention is needed (RB-004#Fix)",
+     "Check which DataNode last held the block and whether it restarted recently (RB-003#Checks)"
+    ],
+    "key_evidence_id": "blk_-3293765112140934524#14",
+    "key_evidence_quote": "ask 10.251.39.64:50010 to replicate blk_-3293765112140934524 to datanode(s) 10.251.201.204:50010",
+    "citations": [
+     "blk_-3293765112140934524#14",
+     "RB-003#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-6525013055308202875",
+   "expected_runbook": "RB-003",
+   "first_ts": "2008-11-10T11:16:30+00:00",
+   "last_ts": "2008-11-10T21:05:28+00:00",
+   "n_events": 27,
+   "signature_line": "BLOCK* ask 10.251.66.102:50010 to replicate blk_-6525013055308202875 to datanode(s) 10.251.75.228:50010",
+   "split": "heldout",
+   "error": null,
+   "seconds": 93.3,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Unplanned re-replication activity triggered by NameNode asking DataNodes to replicate a block due to perceived replication target violations.",
+    "runbook_id": "RB-003",
+    "summary": "The cluster experienced unplanned re-replication for block blk_-6525013055308202875, where the NameNode initiated replication requests to multiple DataNodes. This activity was followed by the deletion of the block's file replicas across the cluster, indicating the block was eventually marked as invalid or orphaned.",
+    "timeline": [
+     "11:16:30 - Block blk_-6525013055308202875 allocated and received on initial DataNode (blk_-65250130553055305#1)",
+     "11:16:49 - NameNode asks 10.251.66.102:50010 to replicate block to 10.251.75.228:50010 (blk_-65250130553055305#5)",
+     "11:16:49 - BlockMap updated as replicas added to multiple DataNodes including 10.251.203.80 and 10.251.66.102 (blk_-65250130553055305#6-7)",
+     "11:16:49 - PacketResponder threads terminate for block blk_-65250130553055305 (blk_-65250130553055305#9-13)",
+     "11:16:51 - Thread starts to transfer block from 10.251.66.102 to 10.251.75.228 (blk_-65250130553055305#15)",
+     "11:16:56 - Block file deleted on local DataNode (blk_-65250130553055305#20)",
+     "21:01:51 - Block added to invalidSet across all three DataNodes (blk_-65250130553055305#22-24)"
+    ],
+    "recommended_actions": [
+     "Let the replication monitor finish as per RB-003#Fix",
+     "Monitor for further orphan block reports to determine if manual intervention is needed (RB-004#Fix)",
+     "Check which DataNode last held the block and whether it restarted recently (RB-003#Checks)"
+    ],
+    "key_evidence_id": "blk_-6525013055308202875#5",
+    "key_evidence_quote": "ask 10.251.66.102:50010 to replicate blk_-6525013055308202875 to datanode(s) 10.251.75.228:50010",
+    "citations": [
+     "blk_-6525013055308202875#5",
+     "RB-003#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_1696895825834834630",
+   "expected_runbook": "RB-003",
+   "first_ts": "2008-11-10T12:25:07+00:00",
+   "last_ts": "2008-11-11T02:33:14+00:00",
+   "n_events": 38,
+   "signature_line": "BLOCK* ask 10.251.67.4:50010 to replicate blk_1696895825834834630 to datanode(s) 10.251.126.255:50010",
+   "split": "heldout",
+   "error": null,
+   "seconds": 83.8,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Unplanned re-replication activity triggered by NameNode reports of blocks belonging to no file, causing excessive replication requests and subsequent block deletion.",
+    "runbook_id": "RB-003",
+    "summary": "The HDFS cluster experienced unplanned re-replication for block blk_1696895825834834630, followed by the deletion of multiple orphan replicas. The NameNode repeatedly asked DataNodes to replicate the block because it believed the block belonged to no file, leading to a cascade of replication requests and eventual cleanup.",
+    "timeline": [
+     "2008-11-10T19:54:26+00:00: WARN log shows exception while serving block (blk_1696895825834834630#15)",
+     "2008-11-10T21:14:38+00:00: NameNode asks 10.251.67.4:50010 to replicate block (blk_1696895825834834630#17)",
+     "2008-11-10T22:27:20+00:00: NameNode adds block to invalidSet of multiple DataNodes (blk_1696895825834834630#33, #34, #35)",
+     "2008-11-10T02:33:14+00:00: Final deletion of block file (blk_1696895825834834630#38)"
+    ],
+    "recommended_actions": [
+     "Let the replication monitor finish as per RB-003#Fix",
+     "Monitor for further orphan block reports to confirm if manual intervention is needed (RB-004#Fix)",
+     "Check which DataNode last held the block and whether it restarted recently (RB-003#Checks)"
+    ],
+    "key_evidence_id": "blk_1696895825834834630#17",
+    "key_evidence_quote": "ask 10.251.67.4:50010 to replicate blk_1696895825834834630 to datanode(s) 10.251.126.255:50010",
+    "citations": [
+     "blk_1696895825834834630#17",
+     "RB-003#Fix"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_7057702030424138911",
+   "expected_runbook": "RB-004",
+   "first_ts": "2008-11-10T01:14:11+00:00",
+   "last_ts": "2008-11-10T10:46:56+00:00",
+   "n_events": 28,
+   "signature_line": "BLOCK* NameSystem.addStoredBlock: addStoredBlock request received for blk_7057702030424138911 on 10.251.106.10:50010 size 28497704 But it does not belong to any file.",
+   "split": "heldout",
+   "error": null,
+   "seconds": 82.2,
+   "scores": {
+    "runbook_correct": false,
+    "verified": true,
+    "signature_cited": false,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "judge": {
+    "deepeval_faithfulness": 0.16666666666666666,
+    "ragas_faithfulness": null,
+    "errors": [
+     "ragas_faithfulness: skipped after repeated failures in this run"
+    ]
+   },
+   "postmortem": {
+    "root_cause": "Block scanner and read errors while serving, likely caused by a client closing the connection early or a network reset.",
+    "runbook_id": "RB-012",
+    "summary": "Multiple clients experienced intermittent failures while reading block blk_7057702030424138911, resulting in \"Got exception while serving\" warnings. The block was eventually deleted due to being reported as belonging to no file, indicating a potential metadata inconsistency or job cancellation.",
+    "timeline": [
+     "2008-11-10T01:14:11+00:00 Block allocation initiated (blk_7057702030424138911#1)",
+     "2008-11-10T02:43:40+00:00 First exception while serving block to client (blk_7057702030424138911#14)",
+     "2008-11-10T10:30:29+00:00 Block added to invalidSet due to missing file reference (blk_7057702030424138911#21)",
+     "2008-11-10T10:46:29+00:00 Redundant addStoredBlock request received for block not belonging to any file (blk_7057702030424138911#26)"
+    ],
+    "recommended_actions": [
+     "Monitor datanode/write_exceptions_per_min and namenode/redundant_reports_per_min metrics for sustained high rates.",
+     "Investigate client-side connection handling or network stability if read errors persist.",
+     "Verify job status to confirm whether the writing job was cancelled or failed."
+    ],
+    "key_evidence_id": "blk_7057702030424138911#14",
+    "key_evidence_quote": "Got exception while serving blk_7057702030424138911 to /10.250.7.244:",
+    "citations": [
+     "blk_7057702030424138911#14",
+     "RB-012#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-31054648672528943",
+   "expected_runbook": "RB-004",
+   "first_ts": "2008-11-10T01:47:55+00:00",
+   "last_ts": "2008-11-10T10:51:44+00:00",
+   "n_events": 30,
+   "signature_line": "BLOCK* NameSystem.addStoredBlock: addStoredBlock request received for blk_-31054648672528943 on 10.251.106.10:50010 size 67108864 But it does not belong to any file.",
+   "split": "heldout",
+   "error": null,
+   "seconds": 95.3,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Block blk_-31054648672528943 was reported as belonging to no file by the NameNode, indicating metadata inconsistency or a failed write job.",
+    "runbook_id": "RB-004",
+    "summary": "The block blk_-31054648672528943 was successfully received and replicated across multiple DataNodes, but the NameNode later reported that it \"does not belong to any file.\" This suggests the writing job may have been cancelled or failed after initial replication, leading to orphaned block reports. The block was subsequently deleted from all nodes' local directories and added to invalidSets before a new, redundant addStoredBlock request appeared for the same block ID.",
+    "timeline": [
+     "2008-11-10T01:47:55+00:00: Block blk_-31054648672528943 was allocated and received from multiple DataNodes (blk_-31054648672528943#2, blk_-31054648672528943#3).",
+     "2008-11-10T01:48:34+00:00: All three replicas were added to the blockMap (blk_-31054648672528943#5, blk_-31054648672528943#6, blk_-31054648672528943#7).",
+     "2008-11-10T04:55:23+00:00 to 08:24:23+00:00: The block was served to multiple clients without immediate errors (blk_-31054648672528943#14, blk_-31054648672528943#17).",
+     "2008-11-10T10:30:43+00:00: The NameNode reported that the block 'does not belong to any file' and added it to invalidSets (blk_-31054648672528943#28).",
+     "2008-11-10T10:35:16+00:00: The block files were deleted from all DataNodes (blk_-31054648672528943#26, blk_-31054648672528943#27)."
+    ],
+    "recommended_actions": [
+     "Investigate the writing job associated with this block to determine if it was cancelled or failed.",
+     "Monitor for redundant addStoredBlock requests and check NameNode RPC latency during high-traffic periods.",
+     "Review DataNode logs for any network resets or disk failures that might have caused write exceptions."
+    ],
+    "key_evidence_id": "blk_-31054648672528943#28",
+    "key_evidence_quote": "addStoredBlock request received for blk_-31054648672528943 on 10.251.106.10:50010 size 67108864 But it does not belong to any file.",
+    "citations": [
+     "blk_-31054648672528943#28",
+     "RB-004#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-2575255227109693633",
+   "expected_runbook": "RB-004",
+   "first_ts": "2008-11-09T23:50:52+00:00",
+   "last_ts": "2008-11-10T10:49:57+00:00",
+   "n_events": 22,
+   "signature_line": "BLOCK* NameSystem.addStoredBlock: addStoredBlock request received for blk_-2575255227109693633 on 10.251.106.10:50010 size 67108864 But it does not belong to any file.",
+   "split": "heldout",
+   "error": null,
+   "seconds": 130.7,
+   "scores": {
+    "runbook_correct": true,
+    "verified": false,
+    "signature_cited": false,
+    "first_draft": false,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Block reported that belongs to no file due to a writing job failure causing orphaned block reports",
+    "runbook_id": "RB-004",
+    "summary": "A block was reported by DataNodes but later found to have no associated file. The block was eventually deleted from the filesystem, indicating the reporting job likely failed or was cancelled before completion.",
+    "timeline": [
+     "2008-11-09T23:50:52+00:00: Block allocation and initial receiving started (blk_-257525522710969363#1)",
+     "2008-11-09T23:51:19+00:00: All replicas were added to the block map (blk_-257525522710969363#5)",
+     "2008-11-10T00:29:36+00:00: Verification succeeded for the block (blk_-257525522710969363#14)",
+     "2008-11-10T10:31:50+00:00: Block was added to invalidSet by NameSystem.delete (blk_-257525522710969363#15)",
+     "2008-11-10T10:46:29+00:00: Another addStoredBlock request received for a block with no file (blk_-257525522710969363#20)"
+    ],
+    "recommended_actions": [
+     "Investigate writing jobs that failed or were cancelled around 2008-11-10T00:00:00+00:00",
+     "Review NameNode logs for other blocks added to invalidSet during the same period",
+     "Monitor namenode/orphan_block_reports_per_min metric to detect future namespace metadata issues"
+    ],
+    "key_evidence_id": "blk_-257525522710969363#20",
+    "key_evidence_quote": "addStoredBlock request received for blk_-2575255227109693633 on 10.251.106.10:50010 size 67108864 But it does not belong to any file.",
+    "citations": [
+     "blk_-257525522710969363#20",
+     "RB-004#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-7693817403508951094",
+   "expected_runbook": "RB-004",
+   "first_ts": "2008-11-10T01:05:35+00:00",
+   "last_ts": "2008-11-10T10:47:34+00:00",
+   "n_events": 33,
+   "signature_line": "BLOCK* NameSystem.addStoredBlock: addStoredBlock request received for blk_-7693817403508951094 on 10.251.106.10:50010 size 67108864 But it does not belong to any file.",
+   "split": "heldout",
+   "error": null,
+   "seconds": 104.0,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": false,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Block blk_-7693817403508951094 was reported as orphaned and later deleted due to a writing job failure, followed by intermittent read errors from clients.",
+    "runbook_id": "RB-004",
+    "summary": "The block blk_-7693817403508951094 was initially created and replicated across three DataNodes. However, the writing job failed, causing the NameNode to mark the block as orphaned (not belonging to any file). The block was subsequently deleted from all nodes. Later, clients experienced read errors while attempting to access this already-deleted block, which were likely caused by the client closing connections early or network issues.",
+    "timeline": [
+     "2008-11-10T01:05:35+00:00: Block blk_-7693817403508951094 allocated and replication initiated (blk_-7693817403508951094#1).",
+     "2008-11-10T01:06:07+00:00: Block blk_-7693817403508951094 fully replicated across three DataNodes (blk_-7693817403508951094#5-7).",
+     "2008-11-10T02:49:19+00:00: First read error reported while serving block to client /10.251.123.195 (blk_-7693817403508951094#16).",
+     "2008-11-10T10:30:29+00:00: Block blk_-7693817403508951094 deleted from all DataNodes due to being an orphan (blk_-7693817403508951094#26-28).",
+     "2008-11-10T10:46:28+00:00: Another attempt to add the block failed as it did not belong to any file (blk_-7693817403508951094#31)."
+    ],
+    "recommended_actions": [
+     "Investigate writing jobs associated with blocks that are later reported as orphans.",
+     "Monitor for spikes in read errors when accessing deleted blocks to identify potential client-side issues.",
+     "Review DataNode logs for network resets or disk failures during periods of high read error rates."
+    ],
+    "key_evidence_id": "blk_-7693817403508951094#16",
+    "key_evidence_quote": "Got exception while serving blk_-7693817403508951094 to /10.251.123.195:",
+    "citations": [
+     "blk_-7693817403508951094#16",
+     "RB-012#Likely causes"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-4538641947576367275",
+   "expected_runbook": "RB-005",
+   "first_ts": "2008-11-10T01:29:13+00:00",
+   "last_ts": "2008-11-10T10:37:16+00:00",
+   "n_events": 32,
+   "signature_line": "BLOCK* NameSystem.addStoredBlock: Redundant addStoredBlock request received for blk_-4538641947576367275 on 10.251.123.20:50010 size 67108864",
+   "split": "heldout",
+   "error": null,
+   "seconds": 97.4,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "judge": {
+    "deepeval_faithfulness": 0.6666666666666666,
+    "ragas_faithfulness": null,
+    "errors": [
+     "ragas_faithfulness: skipped after repeated failures in this run"
+    ]
+   },
+   "postmortem": {
+    "root_cause": "Redundant addStoredBlock requests caused by overlapping block reports and slow NameNode responses led to temporary service degradation.",
+    "runbook_id": "RB-005",
+    "summary": "The HDFS block blk_-4538641947576367275 experienced multiple redundant addStoredBlock requests due to overlapping reports and slow NameNode responses. This caused temporary service degradation, resulting in several \"Got exception while serving\" warnings before the block was eventually deleted.",
+    "timeline": [
+     "2008-11-10T01:29:13+00:00: Block blk_-4538641947576367275 allocated and receiving started (blk_-4538641947576367275#1)",
+     "2008-11-10T01:30:07+00:00: Redundant addStoredBlock request received for blk_-4538641947576367275 on 10.251.123.20:50010 (blk_-4538641947576367275#13)",
+     "2008-11-10T04:11:01+00:00: Got exception while serving blk_-4538641947576367275 to /10.250.11.100 (blk_-4538641947576367275#15)",
+     "2008-11-10T10:30:38+00:00: Block blk_-4538641947576367275 added to invalidSet of multiple DataNodes (blk_-4538641947576367275#27)",
+     "2008-11-10T10:35:31+00:00: Deleting block blk_-4538641947576367275 file (blk_-4538641947576367275#31)"
+    ],
+    "recommended_actions": [
+     "Investigate NameNode RPC latency around the time of redundant reports to identify slow responses.",
+     "Check whether DataNodes restarted or re-registered recently during the incident period.",
+     "Monitor namenode/redundant_reports_per_min metric for future incidents to detect early signs of similar issues."
+    ],
+    "key_evidence_id": "blk_-4538641947576367275#13",
+    "key_evidence_quote": "Redundant addStoredBlock request received for blk_-4538641947576367275 on 10.251.123.20:50010 size 67108864",
+    "citations": [
+     "blk_-4538641947576367275#13",
+     "RB-005#Symptom",
+     "RB-005#Likely causes"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_4011809579485362960",
+   "expected_runbook": "RB-005",
+   "first_ts": "2008-11-11T08:24:17+00:00",
+   "last_ts": "2008-11-11T08:24:49+00:00",
+   "n_events": 14,
+   "signature_line": "BLOCK* NameSystem.addStoredBlock: Redundant addStoredBlock request received for blk_4011809579485362960 on 10.250.19.227:50010 size 67108864",
+   "split": "heldout",
+   "error": null,
+   "seconds": 62.9,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Redundant addStoredBlock request received for blk_4011809579485362960 on 10.250.19.227:50010 size 67108864",
+    "runbook_id": "RB-005",
+    "summary": "The NameNode received a redundant addStoredBlock request for block blk_4011809579485362960 from DataNode 10.250.19.227:50010, indicating the replica was already recorded on that node. This occurred after successfully receiving and storing replicas from other nodes.",
+    "timeline": [
+     "Block allocation initiated at 08:24:17 based on blk_4011809579485362960#1",
+     "Replicas received from multiple DataNodes between 08:24:17 and 08:24:47 based on blk_4011809579485362960#2 through blk_4011809579485362960#12",
+     "Redundant addStoredBlock request received at 08:24:49 based on blk_4011809579485362960#13",
+     "Final replica added to blockMap at 08:24:49 based on blk_4011809579485362960#14"
+    ],
+    "recommended_actions": [
+     "Monitor NameNode RPC queue for potential backlogs",
+     "Check if DataNode 10.250.19.227 restarted or re-registered recently",
+     "Review block report timing against incremental reports for overlapping windows"
+    ],
+    "key_evidence_id": "blk_4011809579485362960#13",
+    "key_evidence_quote": "Redundant addStoredBlock request received for blk_4011809579485362960 on 10.250.19.227:50010 size 67108864",
+    "citations": [
+     "blk_4011809579485362960#13",
+     "RB-005#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-27706715190955553",
+   "expected_runbook": "RB-005",
+   "first_ts": "2008-11-10T01:13:14+00:00",
+   "last_ts": "2008-11-10T10:36:58+00:00",
+   "n_events": 31,
+   "signature_line": "BLOCK* NameSystem.addStoredBlock: Redundant addStoredBlock request received for blk_-27706715190955553 on 10.250.7.230:50010 size 67108864",
+   "split": "heldout",
+   "error": null,
+   "seconds": 81.8,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Redundant addStoredBlock requests caused by overlapping block reports and slow NameNode responses.",
+    "runbook_id": "RB-005",
+    "summary": "A DataNode reported a redundant replica for block blk_-27706715190955553, triggering a warning log. Subsequent serving attempts experienced exceptions due to client-side connection issues or network resets, leading to the block being marked invalid and deleted.",
+    "timeline": [
+     "2008-11-10T01:13:39+00:00: Redundant addStoredBlock request received for blk_-27706715190955553 on 10.250.7.230:50010 (blk_-27706715190955553#13)",
+     "2008-11-10T02:39:51+00:00: Got exception while serving blk_-27706715190955553 to /10.251.203.80 (blk_-27706715190955553#15)",
+     "2008-11-10T10:30:28+00:00: Block marked invalid and deleted from multiple DataNodes (blk_-27706715190955553#26, #27, #28)"
+    ],
+    "recommended_actions": [
+     "Investigate NameNode RPC latency around the time of redundant reports to rule out slow responses.",
+     "Check if any DataNodes restarted or re-registered recently during the incident window.",
+     "Monitor block scanner and read error rates; investigate further if they rise significantly above baseline."
+    ],
+    "key_evidence_id": "blk_-27706715190955553#13",
+    "key_evidence_quote": "Redundant addStoredBlock request received for blk_-27706715190955553 on 10.250.7.230:50010 size 67108864",
+    "citations": [
+     "blk_-27706715190955553#13",
+     "RB-005#Symptom",
+     "RB-005#Likely causes"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-4043091211472414416",
+   "expected_runbook": "RB-005",
+   "first_ts": "2008-11-10T22:58:33+00:00",
+   "last_ts": "2008-11-11T04:46:46+00:00",
+   "n_events": 21,
+   "signature_line": "BLOCK* NameSystem.addStoredBlock: Redundant addStoredBlock request received for blk_-4043091211472414416 on 10.251.202.134:50010 size 67108864",
+   "split": "heldout",
+   "error": null,
+   "seconds": 89.1,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Redundant addStoredBlock request received for blk_-4043091211472414416 on 10.251.202.134:50010 size 67108864",
+    "runbook_id": "RB-005",
+    "summary": "A block report was received from a DataNode for a replica the NameNode already had recorded, triggering a redundant addStoredBlock warning. This occurred during normal block assembly but resulted in unnecessary logging and potential race conditions. The block was eventually deleted due to being added to an invalidSet, likely because it belonged to no file or was part of a failed job.",
+    "timeline": [
+     "2008-11-10T22:59:26+00:00: Block assembly initiated with initial reports from 10.251.66.63 and 10.251.127.243 (based on blk_-4043091211472414416#8)",
+     "2008-11-10T22:59:29+00:00: Redundant addStoredBlock request received for blk_-4043091211472414416 on 10.251.202.134:50010 (based on blk_-4043091211472414416#14)",
+     "2008-11-11T04:43:50+00:00: Block added to invalidSet due to belonging to no file (based on blk_-4043091211472414416#16)",
+     "2008-11-11T04:46:40+00:00: Block files deleted from HDFS storage (based on blk_-4043091211472414416#20)"
+    ],
+    "recommended_actions": [
+     "Investigate DataNode restarts or re-registrations around the time of redundant reports",
+     "Check NameNode RPC latency during block report windows to identify slow responses causing retries",
+     "Review job status for any cancelled or failed jobs that may have generated orphaned blocks"
+    ],
+    "key_evidence_id": "blk_-4043091211472414416#14",
+    "key_evidence_quote": "Redundant addStoredBlock request received for blk_-4043091211472414416 on 10.251.202.134:50010 size 67108864",
+    "citations": [
+     "blk_-4043091211472414416#14",
+     "RB-005#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-8618876526298486184",
+   "expected_runbook": "RB-006",
+   "first_ts": "2008-11-11T03:34:27+00:00",
+   "last_ts": "2008-11-11T04:45:24+00:00",
+   "n_events": 22,
+   "signature_line": "Receiving empty packet for block blk_-8618876526298486184",
+   "split": "heldout",
+   "error": null,
+   "seconds": 72.3,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "judge": {
+    "deepeval_faithfulness": 0.6666666666666666,
+    "ragas_faithfulness": null,
+    "errors": [
+     "ragas_faithfulness: skipped after repeated failures in this run"
+    ]
+   },
+   "postmortem": {
+    "root_cause": "A client closed or flushed the stream without data after an aborted write, resulting in empty packets being received by DataNodes.",
+    "runbook_id": "RB-006",
+    "summary": "The HDFS block blk_-8618876526298486184 was created and partially replicated across three DataNodes before being deleted due to empty packets. The write pipeline received zero-length data packets, triggering the termination of all replication threads. Subsequently, the block was marked as invalid and deleted from the NameNode's storage.",
+    "timeline": [
+     "2008-11-11T03:34:27+00:00: Block blk_-8618876526298486184 allocated and receiving started [blk_-8618876526298486184#1].",
+     "2008-11-11T03:34:28+00:00: Replication continued with data packets from multiple sources [blk_-8618876526298486184#3].",
+     "2008-11-11T03:34:30+00:00: Empty packet received, terminating all PacketResponders for the block [blk_-8618876526298486184#8].",
+     "2008-11-11T04:43:23+00:00: Block marked as invalid and deleted from all DataNodes [blk_-8618876526298486184#17]."
+    ],
+    "recommended_actions": [
+     "Investigate the client that opened the pipeline to determine if it closed or flushed without data.",
+     "Review logs for any aborted write events preceding the empty packet reception."
+    ],
+    "key_evidence_id": "blk_-8618876526298486184#8",
+    "key_evidence_quote": "Receiving empty packet for block blk_-8618876526298486184",
+    "citations": [
+     "blk_-8618876526298486184#8",
+     "RB-006#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_5619400076210202193",
+   "expected_runbook": "RB-006",
+   "first_ts": "2008-11-09T21:24:52+00:00",
+   "last_ts": "2008-11-10T10:36:58+00:00",
+   "n_events": 24,
+   "signature_line": "Receiving empty packet for block blk_5619400076210202193",
+   "split": "heldout",
+   "error": null,
+   "seconds": 73.2,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Empty packets in the write pipeline caused by a client closing or flushing the stream without data after an aborted write.",
+    "runbook_id": "RB-006",
+    "summary": "The HDFS block blk_5619400076210202193 experienced multiple empty packet events during its write pipeline, leading to delayed acknowledgements and eventual deletion. The block was successfully replicated across three DataNodes but was later marked as invalid due to replication failures from specific nodes.",
+    "timeline": [
+     "2008-11-09T21:24:53+00:00: Empty packet received for block blk_5619400076210202193 (blk_5619400076210202193#8)",
+     "2008-11-09T21:24:54+00:00: Empty packet received for block blk_5619400076210202193 (blk_5619400076210202193#11)",
+     "2008-11-09T21:24:54+00:00: Empty packet received for block blk_5619400076210202193 (blk_5619400076210202193#14)",
+     "2008-11-09T21:40:49+00:00: Block served to 10.251.26.177 (blk_5619400076210202193#17)",
+     "2008-11-10T10:31:12+00:00: Block added to invalidSet due to replication failures (blk_5619400076210202193#19)"
+    ],
+    "recommended_actions": [
+     "Replace or exclude the slow node from pipelines, and fix the disk or network cause.",
+     "Check the client that opened the pipeline and whether the write later completed.",
+     "Look for pipeline errors before or after the empty packet."
+    ],
+    "key_evidence_id": "blk_5619400076210202193#8",
+    "key_evidence_quote": "Receiving empty packet for block blk_5619400076210202193",
+    "citations": [
+     "blk_5619400076210202193#8",
+     "RB-006#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_3593005091812289778",
+   "expected_runbook": "RB-006",
+   "first_ts": "2008-11-11T10:23:46+00:00",
+   "last_ts": "2008-11-11T11:06:28+00:00",
+   "n_events": 22,
+   "signature_line": "Receiving empty packet for block blk_3593005091812289778",
+   "split": "heldout",
+   "error": null,
+   "seconds": 75.7,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Empty packets were received during the write pipeline for block blk_3593005091812289778, causing the DataNode to terminate PacketResponders and eventually delete the block.",
+    "runbook_id": "RB-006",
+    "summary": "The write pipeline for block blk_3593005091812289778 experienced multiple empty packet events, leading to the termination of PacketResponders and subsequent deletion of the block. The block was created successfully but failed during replication due to these anomalies.",
+    "timeline": [
+     "Block allocation initiated at 10:23:46 based on [blk_3593005091812289778#1]",
+     "Multiple DataNodes began receiving data for the block between 10:23:47 and 10:23:49 based on [blk_3593005091812289778#2] through [blk_3593005091812289778#7]",
+     "Empty packets were received, causing PacketResponders to terminate based on [blk_3593005091812289778#8] and [blk_3593005091812289778#11]",
+     "The block was deleted from the cluster after being added to invalidSets based on [blk_3593005091812289778#17] through [blk_3593005091812289778#19]",
+     "The block file was deleted from the filesystem between 11:04:32 and 11:06:28 based on [blk_3593005091812289778#20] through [blk_3593005091812289778#22]"
+    ],
+    "recommended_actions": [
+     "Investigate the client that opened the pipeline to determine if it closed or flushed the stream without data after an aborted write.",
+     "Review logs for any pipeline errors before or after the empty packet events to identify potential causes.",
+     "Check network stability and disk health on the DataNodes involved in the replication to rule out hardware issues."
+    ],
+    "key_evidence_id": "blk_3593005091812289778#8",
+    "key_evidence_quote": "Receiving empty packet for block blk_3593005091812289778",
+    "citations": [
+     "blk_3593005091812289778#8",
+     "RB-006#Symptom"
+    ]
+   }
+  },
+  {
+   "block_id": "blk_-949894797024274980",
+   "expected_runbook": "RB-006",
+   "first_ts": "2008-11-11T10:48:50+00:00",
+   "last_ts": "2008-11-11T11:06:25+00:00",
+   "n_events": 22,
+   "signature_line": "Receiving empty packet for block blk_-949894797024274980",
+   "split": "heldout",
+   "error": null,
+   "seconds": 70.5,
+   "scores": {
+    "runbook_correct": true,
+    "verified": true,
+    "signature_cited": true,
+    "first_draft": true,
+    "plan_fallback": false
+   },
+   "postmortem": {
+    "root_cause": "Empty packet received during block write caused by a client closing or flushing the stream without data, as indicated by the (RARE) log entry.",
+    "runbook_id": "RB-006",
+    "summary": "A DataNode received an empty packet while writing block blk_-949894797024274980, triggering a pipeline termination and subsequent deletion of the block from all replicas. The block was created successfully but contained no data before being marked invalid and removed.",
+    "timeline": [
+     "Block allocation initiated at 10:48:50 based on blk_-949894797024274980#1",
+     "Multiple DataNodes began receiving the block, including empty packets at 10:48:52 based on blk_-949894797024274980#8",
+     "Block was marked invalid and deleted from all replicas between 11:04:43 and 11:06:25 based on blk_-949894797024274980#17 through blk_-949894797024274980#22",
+     "High spike in empty packets and write exceptions occurred prior to the failure, as seen in metric evidence"
+    ],
+    "recommended_actions": [
+     "Investigate the client that opened the pipeline for blk_-949894797024274980 to determine if it closed or flushed without data",
+     "Review logs from 10:44:00 to 10:48:50 for pipeline errors related to write exceptions based on metric evidence",
+     "Monitor the cluster for elevated write latency or empty packet rates to identify systemic issues"
+    ],
+    "key_evidence_id": "blk_-949894797024274980#8",
+    "key_evidence_quote": "Receiving empty packet for block blk_-949894797024274980",
+    "citations": [
+     "blk_-949894797024274980#8",
+     "RB-006#Symptom"
+    ]
+   }
+  }
+ ]
+}

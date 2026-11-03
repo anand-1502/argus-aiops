@@ -1,0 +1,272 @@
+[
+  {
+    "block_id": "blk_-1038022846623317329",
+    "expected_runbook": "RB-001",
+    "first_ts": "2008-11-11T04:39:26+00:00",
+    "last_ts": "2008-11-11T04:47:41+00:00",
+    "n_events": 20,
+    "signature_line": "Unexpected error trying to delete block blk_-1038022846623317329. BlockInfo not found in volumeMap.",
+    "split": "seeded"
+  },
+  {
+    "block_id": "blk_-1000723577943457888",
+    "expected_runbook": "RB-002",
+    "first_ts": "2008-11-11T08:17:14+00:00",
+    "last_ts": "2008-11-11T08:17:18+00:00",
+    "n_events": 4,
+    "signature_line": "writeBlock blk_-1000723577943457888 received exception java.io.IOException: Could not read from stream",
+    "split": "seeded"
+  },
+  {
+    "block_id": "blk_-1009207079038502874",
+    "expected_runbook": "RB-003",
+    "first_ts": "2008-11-10T01:14:23+00:00",
+    "last_ts": "2008-11-10T10:36:33+00:00",
+    "n_events": 33,
+    "signature_line": "BLOCK* ask 10.251.122.79:50010 to replicate blk_-1009207079038502874 to datanode(s) 10.251.214.225:50010",
+    "split": "seeded"
+  },
+  {
+    "block_id": "blk_-1001299764911418845",
+    "expected_runbook": "RB-004",
+    "first_ts": "2008-11-09T21:16:57+00:00",
+    "last_ts": "2008-11-10T10:50:48+00:00",
+    "n_events": 25,
+    "signature_line": "BLOCK* NameSystem.addStoredBlock: addStoredBlock request received for blk_-1001299764911418845 on 10.251.106.10:50010 size 67108864 But it does not belong to any file.",
+    "split": "seeded"
+  },
+  {
+    "block_id": "blk_-1014865944005847876",
+    "expected_runbook": "RB-005",
+    "first_ts": "2008-11-09T23:37:21+00:00",
+    "last_ts": "2008-11-10T10:39:08+00:00",
+    "n_events": 20,
+    "signature_line": "BLOCK* NameSystem.addStoredBlock: Redundant addStoredBlock request received for blk_-1014865944005847876 on 10.251.123.195:50010 size 67108864",
+    "split": "seeded"
+  },
+  {
+    "block_id": "blk_-1018884555287540953",
+    "expected_runbook": "RB-006",
+    "first_ts": "2008-11-09T21:22:04+00:00",
+    "last_ts": "2008-11-10T10:36:02+00:00",
+    "n_events": 23,
+    "signature_line": "Receiving empty packet for block blk_-1018884555287540953",
+    "split": "seeded"
+  },
+  {
+    "block_id": "blk_8761834957091365116",
+    "expected_runbook": "RB-001",
+    "first_ts": "2008-11-10T14:47:06+00:00",
+    "last_ts": "2008-11-10T21:06:52+00:00",
+    "n_events": 20,
+    "signature_line": "Unexpected error trying to delete block blk_8761834957091365116. BlockInfo not found in volumeMap.",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_8778297835340841956",
+    "expected_runbook": "RB-001",
+    "first_ts": "2008-11-10T21:25:01+00:00",
+    "last_ts": "2008-11-10T22:10:41+00:00",
+    "n_events": 20,
+    "signature_line": "Unexpected error trying to delete block blk_8778297835340841956. BlockInfo not found in volumeMap.",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_5786911754239753216",
+    "expected_runbook": "RB-001",
+    "first_ts": "2008-11-11T05:12:29+00:00",
+    "last_ts": "2008-11-11T07:59:21+00:00",
+    "n_events": 20,
+    "signature_line": "Unexpected error trying to delete block blk_5786911754239753216. BlockInfo not found in volumeMap.",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_7963243402010652895",
+    "expected_runbook": "RB-001",
+    "first_ts": "2008-11-10T23:06:39+00:00",
+    "last_ts": "2008-11-11T04:49:33+00:00",
+    "n_events": 20,
+    "signature_line": "Unexpected error trying to delete block blk_7963243402010652895. BlockInfo not found in volumeMap.",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_2465764068194463148",
+    "expected_runbook": "RB-002",
+    "first_ts": "2008-11-09T21:06:22+00:00",
+    "last_ts": "2008-11-09T21:06:26+00:00",
+    "n_events": 4,
+    "signature_line": "writeBlock blk_2465764068194463148 received exception java.io.IOException: Could not read from stream",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_-400148118409627480",
+    "expected_runbook": "RB-002",
+    "first_ts": "2008-11-10T21:23:32+00:00",
+    "last_ts": "2008-11-10T21:23:36+00:00",
+    "n_events": 4,
+    "signature_line": "writeBlock blk_-400148118409627480 received exception java.io.IOException: Could not read from stream",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_-8393677600696029949",
+    "expected_runbook": "RB-002",
+    "first_ts": "2008-11-11T10:37:54+00:00",
+    "last_ts": "2008-11-11T10:37:57+00:00",
+    "n_events": 4,
+    "signature_line": "writeBlock blk_-8393677600696029949 received exception java.io.IOException: Could not read from stream",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_-3872590798340718056",
+    "expected_runbook": "RB-002",
+    "first_ts": "2008-11-11T09:03:08+00:00",
+    "last_ts": "2008-11-11T09:03:12+00:00",
+    "n_events": 4,
+    "signature_line": "writeBlock blk_-3872590798340718056 received exception java.io.IOException: Could not read from stream",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_-7918922585982249092",
+    "expected_runbook": "RB-003",
+    "first_ts": "2008-11-10T11:10:12+00:00",
+    "last_ts": "2008-11-10T21:03:37+00:00",
+    "n_events": 27,
+    "signature_line": "BLOCK* ask 10.250.11.100:50010 to replicate blk_-7918922585982249092 to datanode(s) 10.251.91.84:50010",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_-3293765112140934524",
+    "expected_runbook": "RB-003",
+    "first_ts": "2008-11-11T07:14:10+00:00",
+    "last_ts": "2008-11-11T09:12:49+00:00",
+    "n_events": 27,
+    "signature_line": "BLOCK* ask 10.251.39.64:50010 to replicate blk_-3293765112140934524 to datanode(s) 10.251.201.204:50010",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_-6525013055308202875",
+    "expected_runbook": "RB-003",
+    "first_ts": "2008-11-10T11:16:30+00:00",
+    "last_ts": "2008-11-10T21:05:28+00:00",
+    "n_events": 27,
+    "signature_line": "BLOCK* ask 10.251.66.102:50010 to replicate blk_-6525013055308202875 to datanode(s) 10.251.75.228:50010",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_1696895825834834630",
+    "expected_runbook": "RB-003",
+    "first_ts": "2008-11-10T12:25:07+00:00",
+    "last_ts": "2008-11-11T02:33:14+00:00",
+    "n_events": 38,
+    "signature_line": "BLOCK* ask 10.251.67.4:50010 to replicate blk_1696895825834834630 to datanode(s) 10.251.126.255:50010",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_7057702030424138911",
+    "expected_runbook": "RB-004",
+    "first_ts": "2008-11-10T01:14:11+00:00",
+    "last_ts": "2008-11-10T10:46:56+00:00",
+    "n_events": 28,
+    "signature_line": "BLOCK* NameSystem.addStoredBlock: addStoredBlock request received for blk_7057702030424138911 on 10.251.106.10:50010 size 28497704 But it does not belong to any file.",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_-31054648672528943",
+    "expected_runbook": "RB-004",
+    "first_ts": "2008-11-10T01:47:55+00:00",
+    "last_ts": "2008-11-10T10:51:44+00:00",
+    "n_events": 30,
+    "signature_line": "BLOCK* NameSystem.addStoredBlock: addStoredBlock request received for blk_-31054648672528943 on 10.251.106.10:50010 size 67108864 But it does not belong to any file.",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_-2575255227109693633",
+    "expected_runbook": "RB-004",
+    "first_ts": "2008-11-09T23:50:52+00:00",
+    "last_ts": "2008-11-10T10:49:57+00:00",
+    "n_events": 22,
+    "signature_line": "BLOCK* NameSystem.addStoredBlock: addStoredBlock request received for blk_-2575255227109693633 on 10.251.106.10:50010 size 67108864 But it does not belong to any file.",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_-7693817403508951094",
+    "expected_runbook": "RB-004",
+    "first_ts": "2008-11-10T01:05:35+00:00",
+    "last_ts": "2008-11-10T10:47:34+00:00",
+    "n_events": 33,
+    "signature_line": "BLOCK* NameSystem.addStoredBlock: addStoredBlock request received for blk_-7693817403508951094 on 10.251.106.10:50010 size 67108864 But it does not belong to any file.",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_-4538641947576367275",
+    "expected_runbook": "RB-005",
+    "first_ts": "2008-11-10T01:29:13+00:00",
+    "last_ts": "2008-11-10T10:37:16+00:00",
+    "n_events": 32,
+    "signature_line": "BLOCK* NameSystem.addStoredBlock: Redundant addStoredBlock request received for blk_-4538641947576367275 on 10.251.123.20:50010 size 67108864",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_4011809579485362960",
+    "expected_runbook": "RB-005",
+    "first_ts": "2008-11-11T08:24:17+00:00",
+    "last_ts": "2008-11-11T08:24:49+00:00",
+    "n_events": 14,
+    "signature_line": "BLOCK* NameSystem.addStoredBlock: Redundant addStoredBlock request received for blk_4011809579485362960 on 10.250.19.227:50010 size 67108864",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_-27706715190955553",
+    "expected_runbook": "RB-005",
+    "first_ts": "2008-11-10T01:13:14+00:00",
+    "last_ts": "2008-11-10T10:36:58+00:00",
+    "n_events": 31,
+    "signature_line": "BLOCK* NameSystem.addStoredBlock: Redundant addStoredBlock request received for blk_-27706715190955553 on 10.250.7.230:50010 size 67108864",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_-4043091211472414416",
+    "expected_runbook": "RB-005",
+    "first_ts": "2008-11-10T22:58:33+00:00",
+    "last_ts": "2008-11-11T04:46:46+00:00",
+    "n_events": 21,
+    "signature_line": "BLOCK* NameSystem.addStoredBlock: Redundant addStoredBlock request received for blk_-4043091211472414416 on 10.251.202.134:50010 size 67108864",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_-8618876526298486184",
+    "expected_runbook": "RB-006",
+    "first_ts": "2008-11-11T03:34:27+00:00",
+    "last_ts": "2008-11-11T04:45:24+00:00",
+    "n_events": 22,
+    "signature_line": "Receiving empty packet for block blk_-8618876526298486184",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_5619400076210202193",
+    "expected_runbook": "RB-006",
+    "first_ts": "2008-11-09T21:24:52+00:00",
+    "last_ts": "2008-11-10T10:36:58+00:00",
+    "n_events": 24,
+    "signature_line": "Receiving empty packet for block blk_5619400076210202193",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_3593005091812289778",
+    "expected_runbook": "RB-006",
+    "first_ts": "2008-11-11T10:23:46+00:00",
+    "last_ts": "2008-11-11T11:06:28+00:00",
+    "n_events": 22,
+    "signature_line": "Receiving empty packet for block blk_3593005091812289778",
+    "split": "heldout"
+  },
+  {
+    "block_id": "blk_-949894797024274980",
+    "expected_runbook": "RB-006",
+    "first_ts": "2008-11-11T10:48:50+00:00",
+    "last_ts": "2008-11-11T11:06:25+00:00",
+    "n_events": 22,
+    "signature_line": "Receiving empty packet for block blk_-949894797024274980",
+    "split": "heldout"
+  }
+]

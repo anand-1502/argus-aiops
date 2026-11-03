@@ -1,0 +1,16 @@
+{
+ "classifier": {
+  "f1_min": 0.9,
+  "recall_min": 0.9
+ },
+ "retrieval": {
+  "top1_min": 0.8,
+  "top3_min": 0.9
+ },
+ "agent": {
+  "runbook_accuracy": 0.9,
+  "verified_rate": 0.9,
+  "signature_cited_rate": 0.8
+ },
+ "regression_tolerance": 0.05
+}
