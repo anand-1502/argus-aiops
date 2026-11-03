@@ -12,9 +12,9 @@ evidence those servers actually returned. Everything runs on a laptop for $0.
 | --- | --- |
 | ![Agent](docs/screenshots/agent.png) | ![Evals](docs/screenshots/evals.png) |
 
-**Try it without installing anything:** a static copy of the dashboard, built from recorded runs, deploys to GitHub Pages
-(`.github/workflows/pages.yml`; turn on Settings > Pages > Source: GitHub Actions). The agent, uploads and exports need
-the real stack, so they are read-only there. A five-minute demo script is in [docs/DEMO.md](docs/DEMO.md).
+**Live demo: https://anand-1502.github.io/argus-aiops/** is a static copy of the dashboard built from recorded runs and rebuilt
+on every push (`.github/workflows/pages.yml`). The agent, uploads and exports need the real stack, so they are read-only there.
+A five-minute demo script is in [docs/DEMO.md](docs/DEMO.md).
 
 ## What it does
 
