@@ -1,0 +1,1893 @@
+{
+ "blk_-1038022846623317329": {
+  "block_id": "blk_-1038022846623317329",
+  "label": "Anomaly",
+  "postmortem": {
+   "root_cause": "DataNode deletion failure due to missing volume map entry for block blk_-1038022846623317329",
+   "runbook_id": "RB-001",
+   "summary": "The DataNode attempted to delete a replica of block blk_-1038022846623317329 but failed because the BlockInfo was not found in its volumeMap. This occurred shortly after the NameNode successfully added the block to the invalidSet and initiated deletion, indicating a timing mismatch where the DataNode's state did not reflect the NameNode's action.",
+   "timeline": [
+    "Block allocation and receiving completed normally (blk_-1038022846623317329#5)",
+    "NameNode added block to invalidSet for all replicas (blk_-1038022846623317329#14)",
+    "DataNode attempted deletion but failed due to missing volume map entry (blk_-1038022846623317329#18)",
+    "Deletion eventually succeeded after retry and state synchronization (blk_-1038022846623317329#19)"
+   ],
+   "recommended_actions": [
+    "Monitor for repeated occurrences of this specific error message to identify potential volume map corruption",
+    "Restart the DataNode if the same block ID repeats for hours, as per RB-001#Fix",
+    "Run a block report after any DataNode restart to ensure state consistency"
+   ],
+   "key_evidence_id": "blk_-1038022846623317329#18",
+   "key_evidence_quote": "Unexpected error trying to delete block blk_-1038022846623317329. BlockInfo not found in volumeMap.",
+   "citations": [
+    "blk_-1038022846623317329#18",
+    "RB-001#Symptom"
+   ]
+  },
+  "verification": {
+   "ok": true,
+   "reason": "all citations resolve to retrieved evidence",
+   "unknown": [],
+   "counts": {
+    "log": 1,
+    "runbook": 1
+   }
+  },
+  "drafts": 1,
+  "notes": [],
+  "trace": [
+   {
+    "server": "logs-db",
+    "tool": "get_block_events",
+    "args": {
+     "block_id": "blk_-1038022846623317329",
+     "limit": 60
+    },
+    "rows": 20,
+    "ms": 938
+   },
+   {
+    "server": "logs-db",
+    "tool": "get_block_label",
+    "args": {
+     "block_id": "blk_-1038022846623317329"
+    },
+    "rows": 2,
+    "ms": 178
+   },
+   {
+    "server": "logs-db",
+    "tool": "get_unusual_events",
+    "args": {
+     "block_id": "blk_-1038022846623317329",
+     "top": 3
+    },
+    "rows": 1,
+    "ms": 84
+   },
+   {
+    "server": "metrics",
+    "tool": "list_metrics",
+    "args": {},
+    "rows": 9,
+    "ms": 174
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "Unexpected error trying to delete block . BlockInfo not found in volumeMap.",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 97141
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "Unexpected error trying to delete block",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 10274
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "BlockInfo not found in volumeMap",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 10766
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "delete_errors_per_min",
+     "start": "2008-11-11T04:29:26+00:00",
+     "end": "2008-11-11T04:57:41+00:00"
+    },
+    "rows": 8,
+    "ms": 2372
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "empty_packets_per_min",
+     "start": "2008-11-11T04:29:26+00:00",
+     "end": "2008-11-11T04:57:41+00:00"
+    },
+    "rows": 8,
+    "ms": 737
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "write_exceptions_per_min",
+     "start": "2008-11-11T04:29:26+00:00",
+     "end": "2008-11-11T04:57:41+00:00"
+    },
+    "rows": 8,
+    "ms": 375
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "orphan_block_reports_per_min",
+     "start": "2008-11-11T04:29:26+00:00",
+     "end": "2008-11-11T04:57:41+00:00"
+    },
+    "rows": 8,
+    "ms": 800
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "redundant_reports_per_min",
+     "start": "2008-11-11T04:29:26+00:00",
+     "end": "2008-11-11T04:57:41+00:00"
+    },
+    "rows": 8,
+    "ms": 483
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "replication_requests_per_min",
+     "start": "2008-11-11T04:29:26+00:00",
+     "end": "2008-11-11T04:57:41+00:00"
+    },
+    "rows": 8,
+    "ms": 72
+   }
+  ],
+  "evidence": {
+   "blk_-1038022846623317329#1": {
+    "kind": "log",
+    "text": "2008-11-11T04:39:26+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.allocateBlock: /user/root/randtxt4/_temporary/_task_200811101024_0010_m_001973_1/part-01973. blk_-1038022846623317329"
+   },
+   "blk_-1038022846623317329#2": {
+    "kind": "log",
+    "text": "2008-11-11T04:39:27+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1038022846623317329 src: /10.251.203.4:46482 dest: /10.251.203.4:50010"
+   },
+   "blk_-1038022846623317329#3": {
+    "kind": "log",
+    "text": "2008-11-11T04:39:27+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1038022846623317329 src: /10.251.199.19:50270 dest: /10.251.199.19:50010"
+   },
+   "blk_-1038022846623317329#4": {
+    "kind": "log",
+    "text": "2008-11-11T04:39:27+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1038022846623317329 src: /10.251.199.19:49228 dest: /10.251.199.19:50010"
+   },
+   "blk_-1038022846623317329#5": {
+    "kind": "log",
+    "text": "2008-11-11T04:39:47+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.203.4:50010 is added to blk_-1038022846623317329 size 67108864"
+   },
+   "blk_-1038022846623317329#6": {
+    "kind": "log",
+    "text": "2008-11-11T04:39:47+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.199.19:50010 is added to blk_-1038022846623317329 size 67108864"
+   },
+   "blk_-1038022846623317329#7": {
+    "kind": "log",
+    "text": "2008-11-11T04:39:47+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.203.80:50010 is added to blk_-1038022846623317329 size 67108864"
+   },
+   "blk_-1038022846623317329#8": {
+    "kind": "log",
+    "text": "2008-11-11T04:39:47+00:00 INFO dfs.DataNode$PacketResponder: PacketResponder 0 for block blk_-1038022846623317329 terminating"
+   },
+   "blk_-1038022846623317329#9": {
+    "kind": "log",
+    "text": "2008-11-11T04:39:47+00:00 INFO dfs.DataNode$PacketResponder: Received block blk_-1038022846623317329 of size 67108864 from /10.251.203.4"
+   },
+   "blk_-1038022846623317329#10": {
+    "kind": "log",
+    "text": "2008-11-11T04:39:47+00:00 INFO dfs.DataNode$PacketResponder: PacketResponder 1 for block blk_-1038022846623317329 terminating"
+   },
+   "blk_-1038022846623317329#11": {
+    "kind": "log",
+    "text": "2008-11-11T04:39:47+00:00 INFO dfs.DataNode$PacketResponder: Received block blk_-1038022846623317329 of size 67108864 from /10.251.199.19"
+   },
+   "blk_-1038022846623317329#12": {
+    "kind": "log",
+    "text": "2008-11-11T04:39:47+00:00 INFO dfs.DataNode$PacketResponder: PacketResponder 2 for block blk_-1038022846623317329 terminating"
+   },
+   "blk_-1038022846623317329#13": {
+    "kind": "log",
+    "text": "2008-11-11T04:39:47+00:00 INFO dfs.DataNode$PacketResponder: Received block blk_-1038022846623317329 of size 67108864 from /10.251.199.19"
+   },
+   "blk_-1038022846623317329#14": {
+    "kind": "log",
+    "text": "2008-11-11T04:42:58+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_-1038022846623317329 is added to invalidSet of 10.251.199.19:50010"
+   },
+   "blk_-1038022846623317329#15": {
+    "kind": "log",
+    "text": "2008-11-11T04:42:58+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_-1038022846623317329 is added to invalidSet of 10.251.203.4:50010"
+   },
+   "blk_-1038022846623317329#16": {
+    "kind": "log",
+    "text": "2008-11-11T04:42:58+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_-1038022846623317329 is added to invalidSet of 10.251.203.80:50010"
+   },
+   "blk_-1038022846623317329#17": {
+    "kind": "log",
+    "text": "2008-11-11T04:43:02+00:00 INFO dfs.FSDataset: Deleting block blk_-1038022846623317329 file /mnt/hadoop/dfs/data/current/subdir25/blk_-1038022846623317329"
+   },
+   "blk_-1038022846623317329#18": {
+    "kind": "log",
+    "text": "2008-11-11T04:47:22+00:00 WARN dfs.FSDataset: Unexpected error trying to delete block blk_-1038022846623317329. BlockInfo not found in volumeMap."
+   },
+   "blk_-1038022846623317329#19": {
+    "kind": "log",
+    "text": "2008-11-11T04:47:38+00:00 INFO dfs.FSDataset: Deleting block blk_-1038022846623317329 file /mnt/hadoop/dfs/data/current/subdir51/blk_-1038022846623317329"
+   },
+   "blk_-1038022846623317329#20": {
+    "kind": "log",
+    "text": "2008-11-11T04:47:41+00:00 INFO dfs.FSDataset: Deleting block blk_-1038022846623317329 file /mnt/hadoop/dfs/data/current/subdir9/blk_-1038022846623317329"
+   },
+   "RB-001#Likely causes": {
+    "kind": "runbook",
+    "text": "Delete fails: BlockInfo not found in volumeMap - Likely causes: - The NameNode sent a duplicate or late delete (invalidate) command after the replica was already removed.\n- The replica never finalized because the write failed part-way, so the DataNode has no volume map entry.\n- The DataNode restarted and rebuilt its volume map without a replica the NameNode still lists."
+   },
+   "RB-001#Checks": {
+    "kind": "runbook",
+    "text": "Delete fails: BlockInfo not found in volumeMap - Checks: 1. Search the DataNode log for an earlier `Deleting block` line for the same block id.\n2. Check whether the block's write completed: look for `Received block ... of size` and `PacketResponder ... terminating`.\n3. Compare the NameNode's invalidSet entries for this block against DataNode restarts in the same window."
+   },
+   "RB-001#Fix": {
+    "kind": "runbook",
+    "text": "Delete fails: BlockInfo not found in volumeMap - Fix: Usually harmless on its own: the NameNode retries deletes and the entry clears. If the same block id repeats for hours, restart the DataNode to rebuild its volume map and run a block report."
+   },
+   "RB-001#Symptom": {
+    "kind": "runbook",
+    "text": "Delete fails: BlockInfo not found in volumeMap - Symptom: A DataNode logs `Unexpected error trying to delete block blk_... BlockInfo not found in volumeMap.` when it is told to delete a replica it has no record of."
+   },
+   "RB-004#Checks": {
+    "kind": "runbook",
+    "text": "Block reported that belongs to no file - Checks: 1. Look for `NameSystem.delete` lines that mention the same block close in time.\n2. Check whether the writing job was cancelled or failed.\n3. Confirm whether the block later appears in an invalidSet."
+   },
+   "RB-001#Escalate": {
+    "kind": "runbook",
+    "text": "Delete fails: BlockInfo not found in volumeMap - Escalate: Escalate if many distinct blocks show the error at once, which points to a volume map corruption or a bad disk."
+   },
+   "metric:datanode/delete_errors_per_min": {
+    "kind": "metric",
+    "text": "datanode/delete_errors_per_min (derived-from-logs): max 224.0 at 2008-11-11T04:47:00+00:00, mean 19.36 over the window"
+   },
+   "metric:datanode/empty_packets_per_min": {
+    "kind": "metric",
+    "text": "datanode/empty_packets_per_min (derived-from-logs): max 6.0 at 2008-11-11T04:54:00+00:00, mean 1.07 over the window"
+   },
+   "metric:datanode/write_exceptions_per_min": {
+    "kind": "metric",
+    "text": "datanode/write_exceptions_per_min (derived-from-logs): max 8.0 at 2008-11-11T04:33:00+00:00, mean 2.29 over the window"
+   },
+   "metric:namenode/orphan_block_reports_per_min": {
+    "kind": "metric",
+    "text": "namenode/orphan_block_reports_per_min (derived-from-logs): max 6.0 at 2008-11-11T04:43:00+00:00, mean 0.21 over the window"
+   },
+   "metric:namenode/redundant_reports_per_min": {
+    "kind": "metric",
+    "text": "namenode/redundant_reports_per_min (derived-from-logs): max 6.0 at 2008-11-11T04:53:00+00:00, mean 0.82 over the window"
+   },
+   "metric:namenode/replication_requests_per_min": {
+    "kind": "metric",
+    "text": "namenode/replication_requests_per_min (derived-from-logs): max 74.0 at 2008-11-11T04:56:00+00:00, mean 9.32 over the window"
+   }
+  },
+  "seconds": 194.6,
+  "model": "qwen3.5:4b",
+  "expected_runbook": "RB-001"
+ },
+ "blk_-1000723577943457888": {
+  "block_id": "blk_-1000723577943457888",
+  "label": "Anomaly",
+  "postmortem": {
+   "root_cause": "Write pipeline failure due to a connection loss during block write, as indicated by the IOException: Could not read from stream.",
+   "runbook_id": "RB-002",
+   "summary": "The HDFS DataNode failed to complete the write of block blk_-1000723577943457888. The write pipeline lost connection mid-stream, resulting in a failure to finalize the block. This occurred shortly after receiving multiple data chunks from an upstream source.",
+   "timeline": [
+    "Block allocation initiated at 08:17:14 based on [blk_-1000723577943457888#1]",
+    "Data received from /10.251.30.179:42625 at 08:17:16 based on [blk_-1000723577943457888#3]",
+    "Write pipeline failed with IOException: Could not read from stream at 08:17:18 based on [blk_-1000723577943457888#4]"
+   ],
+   "recommended_actions": [
+    "Investigate the upstream node (10.251.30.179) for crashes, restarts, or long GC pauses around 08:17.",
+    "Check network stability and timeouts between the pipeline nodes at the time of failure.",
+    "Monitor write exceptions across other DataNodes to determine if this was an isolated event or part of a network fault."
+   ],
+   "key_evidence_id": "blk_-1000723577943457888#4",
+   "key_evidence_quote": "Could not read from stream",
+   "citations": [
+    "blk_-1000723577943457888#4",
+    "RB-002#Symptom"
+   ]
+  },
+  "verification": {
+   "ok": true,
+   "reason": "all citations resolve to retrieved evidence",
+   "unknown": [],
+   "counts": {
+    "log": 1,
+    "runbook": 1
+   }
+  },
+  "drafts": 1,
+  "notes": [],
+  "trace": [
+   {
+    "server": "logs-db",
+    "tool": "get_block_events",
+    "args": {
+     "block_id": "blk_-1000723577943457888",
+     "limit": 60
+    },
+    "rows": 4,
+    "ms": 1077
+   },
+   {
+    "server": "logs-db",
+    "tool": "get_block_label",
+    "args": {
+     "block_id": "blk_-1000723577943457888"
+    },
+    "rows": 2,
+    "ms": 71
+   },
+   {
+    "server": "logs-db",
+    "tool": "get_unusual_events",
+    "args": {
+     "block_id": "blk_-1000723577943457888",
+     "top": 3
+    },
+    "rows": 1,
+    "ms": 123
+   },
+   {
+    "server": "metrics",
+    "tool": "list_metrics",
+    "args": {},
+    "rows": 9,
+    "ms": 179
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "writeBlock  received exception java.io.IOException: Could not read from stream",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 195621
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "writeBlock blk_-1000723577943457888 received exception java.io.IOException: Could not read from stream",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 3810
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "HDFS block allocation failure IOException",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 2912
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "delete_errors_per_min",
+     "start": "2008-11-11T08:07:14+00:00",
+     "end": "2008-11-11T08:27:18+00:00"
+    },
+    "rows": 8,
+    "ms": 1611
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "disk_util_pct",
+     "start": "2008-11-11T08:07:14+00:00",
+     "end": "2008-11-11T08:27:18+00:00"
+    },
+    "rows": 8,
+    "ms": 28
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "empty_packets_per_min",
+     "start": "2008-11-11T08:07:14+00:00",
+     "end": "2008-11-11T08:27:18+00:00"
+    },
+    "rows": 8,
+    "ms": 21
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "write_exceptions_per_min",
+     "start": "2008-11-11T08:07:14+00:00",
+     "end": "2008-11-11T08:27:18+00:00"
+    },
+    "rows": 8,
+    "ms": 105
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "orphan_block_reports_per_min",
+     "start": "2008-11-11T08:07:14+00:00",
+     "end": "2008-11-11T08:27:18+00:00"
+    },
+    "rows": 8,
+    "ms": 26
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "redundant_reports_per_min",
+     "start": "2008-11-11T08:07:14+00:00",
+     "end": "2008-11-11T08:27:18+00:00"
+    },
+    "rows": 8,
+    "ms": 165
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "replication_requests_per_min",
+     "start": "2008-11-11T08:07:14+00:00",
+     "end": "2008-11-11T08:27:18+00:00"
+    },
+    "rows": 8,
+    "ms": 24
+   }
+  ],
+  "evidence": {
+   "blk_-1000723577943457888#1": {
+    "kind": "log",
+    "text": "2008-11-11T08:17:14+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.allocateBlock: /user/root/rand7/_temporary/_task_200811101024_0014_m_000623_0/part-00623. blk_-1000723577943457888"
+   },
+   "blk_-1000723577943457888#2": {
+    "kind": "log",
+    "text": "2008-11-11T08:17:14+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1000723577943457888 src: /10.251.30.179:54915 dest: /10.251.30.179:50010"
+   },
+   "blk_-1000723577943457888#3": {
+    "kind": "log",
+    "text": "2008-11-11T08:17:16+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1000723577943457888 src: /10.251.30.179:42625 dest: /10.251.30.179:50010"
+   },
+   "blk_-1000723577943457888#4": {
+    "kind": "log",
+    "text": "2008-11-11T08:17:18+00:00 INFO dfs.DataNode$DataXceiver: writeBlock blk_-1000723577943457888 received exception java.io.IOException: Could not read from stream"
+   },
+   "RB-002#Symptom": {
+    "kind": "runbook",
+    "text": "Write pipeline failure: could not read from stream - Symptom: `writeBlock blk_... received exception java.io.IOException: Could not read from stream` means a DataNode lost the connection from the upstream writer or client mid-write."
+   },
+   "RB-002#Likely causes": {
+    "kind": "runbook",
+    "text": "Write pipeline failure: could not read from stream - Likely causes: - The client or the upstream DataNode died or was killed during the write.\n- A network interruption or timeout between pipeline nodes.\n- The upstream node was overloaded and closed the socket."
+   },
+   "RB-002#Checks": {
+    "kind": "runbook",
+    "text": "Write pipeline failure: could not read from stream - Checks: 1. Find the matching `Receiving block` line to see the pipeline's source and destination addresses.\n2. Check the upstream node's logs for a crash, restart or long GC pause at the same minute.\n3. Look for a burst of the same exception across several DataNodes, which suggests a network fault."
+   },
+   "RB-007#Fix": {
+    "kind": "runbook",
+    "text": "DataNode disk full or near full - Fix: Free space or add volumes, then run the HDFS balancer to even out usage."
+   },
+   "RB-007#Likely causes": {
+    "kind": "runbook",
+    "text": "DataNode disk full or near full - Likely causes: - Data growth outpaced capacity.\n- Logs or temp files on the data volume.\n- Unbalanced block placement."
+   },
+   "RB-011#Symptom": {
+    "kind": "runbook",
+    "text": "Corrupt block replica - Symptom: A replica fails checksum verification during a read or the block scanner."
+   },
+   "metric:datanode/disk_util_pct": {
+    "kind": "metric",
+    "text": "datanode/disk_util_pct (simulated): max 79.8 at 2008-11-11T08:17:00+00:00, mean 56.76 over the window"
+   },
+   "metric:datanode/empty_packets_per_min": {
+    "kind": "metric",
+    "text": "datanode/empty_packets_per_min (derived-from-logs): max 12.0 at 2008-11-11T08:08:00+00:00, mean 2.10 over the window"
+   },
+   "metric:datanode/write_exceptions_per_min": {
+    "kind": "metric",
+    "text": "datanode/write_exceptions_per_min (derived-from-logs): max 7.0 at 2008-11-11T08:11:00+00:00, mean 2.90 over the window"
+   },
+   "metric:namenode/redundant_reports_per_min": {
+    "kind": "metric",
+    "text": "namenode/redundant_reports_per_min (derived-from-logs): max 4.0 at 2008-11-11T08:16:00+00:00, mean 1.20 over the window"
+   },
+   "metric:namenode/replication_requests_per_min": {
+    "kind": "metric",
+    "text": "namenode/replication_requests_per_min (derived-from-logs): max 709.0 at 2008-11-11T08:09:00+00:00, mean 40.35 over the window"
+   }
+  },
+  "seconds": 280.3,
+  "model": "qwen3.5:4b",
+  "expected_runbook": "RB-002"
+ },
+ "blk_-1009207079038502874": {
+  "block_id": "blk_-1009207079038502874",
+  "label": "Anomaly",
+  "postmortem": {
+   "root_cause": "Unplanned re-replication activity triggered by NameNode asking DataNodes to replicate a block below its target count.",
+   "runbook_id": "RB-003",
+   "summary": "The cluster experienced unplanned re-replication for block blk_-1009207079038502874, where the NameNode initiated replication requests to DataNodes that had fallen below their target replication factor. This activity was followed by the deletion of orphan replicas and intermittent write exceptions during serving attempts.",
+   "timeline": [
+    "NameSystem.allocateBlock: block blk_-1009207079038502874 allocated (blk_-1009207079038502874#1)",
+    "Multiple DataNodes received the block and added it to their blockMap (blk_-1009207079038502874#5, #6, #10, #14)",
+    "NameSystem asked 10.251.122.79:50010 to replicate the block to other datanodes (blk_-1009207079038502874#13)",
+    "Replication thread started and block was transmitted to 10.251.214.225:50010 (blk_-1009207079038502874#15, #19)",
+    "Orphan replicas were deleted from multiple DataNodes (blk_-1009207079038502874#28, #29, #30, #31, #32, #33)",
+    "Intermittent write exceptions occurred while serving the block to clients (blk_-1009207079038502874#21, #23, #25, #27)"
+   ],
+   "recommended_actions": [
+    "Let the replication monitor finish transferring the block.",
+    "Monitor the replication queue size to ensure transfers are keeping up.",
+    "Check which DataNode last held the block and whether it restarted recently.",
+    "If transfers remain slow, raise the replication stream limits temporarily."
+   ],
+   "key_evidence_id": "blk_-1009207079038502874#13",
+   "key_evidence_quote": "ask 10.251.122.79:50010 to replicate blk_-1009207079038502874 to datanode(s) 10.251.214.225:50010",
+   "citations": [
+    "blk_-1009207079038502874#13",
+    "RB-003#Symptom"
+   ]
+  },
+  "verification": {
+   "ok": true,
+   "reason": "all citations resolve to retrieved evidence",
+   "unknown": [],
+   "counts": {
+    "log": 1,
+    "runbook": 1
+   }
+  },
+  "drafts": 1,
+  "notes": [],
+  "trace": [
+   {
+    "server": "logs-db",
+    "tool": "get_block_events",
+    "args": {
+     "block_id": "blk_-1009207079038502874",
+     "limit": 60
+    },
+    "rows": 33,
+    "ms": 5238
+   },
+   {
+    "server": "logs-db",
+    "tool": "get_block_label",
+    "args": {
+     "block_id": "blk_-1009207079038502874"
+    },
+    "rows": 2,
+    "ms": 89
+   },
+   {
+    "server": "logs-db",
+    "tool": "get_unusual_events",
+    "args": {
+     "block_id": "blk_-1009207079038502874",
+     "top": 3
+    },
+    "rows": 3,
+    "ms": 83
+   },
+   {
+    "server": "metrics",
+    "tool": "list_metrics",
+    "args": {},
+    "rows": 9,
+    "ms": 650
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "BLOCK* ask  to replicate  to datanode(s)",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 40096
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "Starting thread to transfer block  to",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 6153
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "BLOCK* ask ... to replicate ... to datanode(s)",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 1994
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "delete_errors_per_min",
+     "start": "2008-11-10T01:04:23+00:00",
+     "end": "2008-11-10T10:46:33+00:00"
+    },
+    "rows": 8,
+    "ms": 497
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "disk_util_pct",
+     "start": "2008-11-10T01:04:23+00:00",
+     "end": "2008-11-10T10:46:33+00:00"
+    },
+    "rows": 8,
+    "ms": 34
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "empty_packets_per_min",
+     "start": "2008-11-10T01:04:23+00:00",
+     "end": "2008-11-10T10:46:33+00:00"
+    },
+    "rows": 8,
+    "ms": 21
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "write_exceptions_per_min",
+     "start": "2008-11-10T01:04:23+00:00",
+     "end": "2008-11-10T10:46:33+00:00"
+    },
+    "rows": 8,
+    "ms": 19
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "orphan_block_reports_per_min",
+     "start": "2008-11-10T01:04:23+00:00",
+     "end": "2008-11-10T10:46:33+00:00"
+    },
+    "rows": 8,
+    "ms": 59
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "redundant_reports_per_min",
+     "start": "2008-11-10T01:04:23+00:00",
+     "end": "2008-11-10T10:46:33+00:00"
+    },
+    "rows": 8,
+    "ms": 31
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "replication_requests_per_min",
+     "start": "2008-11-10T01:04:23+00:00",
+     "end": "2008-11-10T10:46:33+00:00"
+    },
+    "rows": 8,
+    "ms": 18
+   }
+  ],
+  "evidence": {
+   "blk_-1009207079038502874#1": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:23+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.allocateBlock: /user/root/randtxt/_temporary/_task_200811092030_0003_m_000371_0/part-00371. blk_-1009207079038502874"
+   },
+   "blk_-1009207079038502874#2": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:24+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1009207079038502874 src: /10.251.122.79:40097 dest: /10.251.122.79:50010"
+   },
+   "blk_-1009207079038502874#3": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:24+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1009207079038502874 src: /10.251.122.79:34492 dest: /10.251.122.79:50010"
+   },
+   "blk_-1009207079038502874#4": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:28+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1009207079038502874 src: /10.251.27.63:47062 dest: /10.251.27.63:50010"
+   },
+   "blk_-1009207079038502874#5": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:49+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.122.79:50010 is added to blk_-1009207079038502874 size 28497502"
+   },
+   "blk_-1009207079038502874#6": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:49+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.250.11.100:50010 is added to blk_-1009207079038502874 size 28497502"
+   },
+   "blk_-1009207079038502874#7": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:49+00:00 INFO dfs.DataNode$PacketResponder: PacketResponder 2 for block blk_-1009207079038502874 terminating"
+   },
+   "blk_-1009207079038502874#8": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:49+00:00 INFO dfs.DataNode$PacketResponder: Received block blk_-1009207079038502874 of size 28497502 from /10.251.122.79"
+   },
+   "blk_-1009207079038502874#9": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:49+00:00 INFO dfs.DataNode$PacketResponder: PacketResponder 0 for block blk_-1009207079038502874 terminating"
+   },
+   "blk_-1009207079038502874#10": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:49+00:00 INFO dfs.DataNode$PacketResponder: Received block blk_-1009207079038502874 of size 28497502 from /10.251.27.63"
+   },
+   "blk_-1009207079038502874#11": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:49+00:00 INFO dfs.DataNode$PacketResponder: PacketResponder 1 for block blk_-1009207079038502874 terminating"
+   },
+   "blk_-1009207079038502874#12": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:49+00:00 INFO dfs.DataNode$PacketResponder: Received block blk_-1009207079038502874 of size 28497502 from /10.251.122.79"
+   },
+   "blk_-1009207079038502874#13": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:50+00:00 INFO dfs.FSNamesystem: BLOCK* ask 10.251.122.79:50010 to replicate blk_-1009207079038502874 to datanode(s) 10.251.214.225:50010"
+   },
+   "blk_-1009207079038502874#14": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:50+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.27.63:50010 is added to blk_-1009207079038502874 size 28497502"
+   },
+   "blk_-1009207079038502874#15": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:52+00:00 INFO dfs.DataNode: 10.251.122.79:50010 Starting thread to transfer block blk_-1009207079038502874 to 10.251.214.225:50010"
+   },
+   "blk_-1009207079038502874#16": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:52+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1009207079038502874 src: /10.251.122.79:51975 dest: /10.251.122.79:50010"
+   },
+   "blk_-1009207079038502874#17": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:59+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.214.225:50010 is added to blk_-1009207079038502874 size 28497502"
+   },
+   "blk_-1009207079038502874#18": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:59+00:00 INFO dfs.DataNode$DataXceiver: Received block blk_-1009207079038502874 src: /10.251.122.79:51975 dest: /10.251.122.79:50010 of size 28497502"
+   },
+   "blk_-1009207079038502874#19": {
+    "kind": "log",
+    "text": "2008-11-10T01:14:59+00:00 INFO dfs.DataNode$DataTransfer: 10.251.122.79:50010:Transmitted block blk_-1009207079038502874 to /10.251.214.225:50010"
+   },
+   "blk_-1009207079038502874#20": {
+    "kind": "log",
+    "text": "2008-11-10T01:15:04+00:00 INFO dfs.FSDataset: Deleting block blk_-1009207079038502874 file /mnt/hadoop/dfs/data/current/subdir37/blk_-1009207079038502874"
+   },
+   "blk_-1009207079038502874#21": {
+    "kind": "log",
+    "text": "2008-11-10T02:55:12+00:00 WARN dfs.DataNode$DataXceiver: 10.250.11.100:50010:Got exception while serving blk_-1009207079038502874 to /10.250.15.198:"
+   },
+   "blk_-1009207079038502874#22": {
+    "kind": "log",
+    "text": "2008-11-10T06:15:19+00:00 INFO dfs.DataNode$DataXceiver: 10.251.122.79:50010 Served block blk_-1009207079038502874 to /10.251.122.79"
+   },
+   "blk_-1009207079038502874#23": {
+    "kind": "log",
+    "text": "2008-11-10T07:01:23+00:00 WARN dfs.DataNode$DataXceiver: 10.251.122.79:50010:Got exception while serving blk_-1009207079038502874 to /10.250.15.198:"
+   },
+   "blk_-1009207079038502874#24": {
+    "kind": "log",
+    "text": "2008-11-10T07:25:35+00:00 INFO dfs.DataNode$DataXceiver: 10.251.122.79:50010 Served block blk_-1009207079038502874 to /10.251.122.79"
+   },
+   "blk_-1009207079038502874#25": {
+    "kind": "log",
+    "text": "2008-11-10T08:09:54+00:00 WARN dfs.DataNode$DataXceiver: 10.251.122.79:50010:Got exception while serving blk_-1009207079038502874 to /10.250.15.198:"
+   },
+   "blk_-1009207079038502874#26": {
+    "kind": "log",
+    "text": "2008-11-10T08:33:36+00:00 INFO dfs.DataNode$DataXceiver: 10.251.122.79:50010 Served block blk_-1009207079038502874 to /10.251.122.79"
+   },
+   "blk_-1009207079038502874#27": {
+    "kind": "log",
+    "text": "2008-11-10T09:22:26+00:00 WARN dfs.DataNode$DataXceiver: 10.251.122.79:50010:Got exception while serving blk_-1009207079038502874 to /10.250.15.198:"
+   },
+   "blk_-1009207079038502874#28": {
+    "kind": "log",
+    "text": "2008-11-10T10:30:30+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_-1009207079038502874 is added to invalidSet of 10.250.11.100:50010"
+   },
+   "blk_-1009207079038502874#29": {
+    "kind": "log",
+    "text": "2008-11-10T10:30:30+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_-1009207079038502874 is added to invalidSet of 10.251.122.79:50010"
+   },
+   "blk_-1009207079038502874#30": {
+    "kind": "log",
+    "text": "2008-11-10T10:30:30+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_-1009207079038502874 is added to invalidSet of 10.251.214.225:50010"
+   },
+   "blk_-1009207079038502874#31": {
+    "kind": "log",
+    "text": "2008-11-10T10:35:43+00:00 INFO dfs.FSDataset: Deleting block blk_-1009207079038502874 file /mnt/hadoop/dfs/data/current/subdir32/blk_-1009207079038502874"
+   },
+   "blk_-1009207079038502874#32": {
+    "kind": "log",
+    "text": "2008-11-10T10:36:24+00:00 INFO dfs.FSDataset: Deleting block blk_-1009207079038502874 file /mnt/hadoop/dfs/data/current/subdir33/blk_-1009207079038502874"
+   },
+   "blk_-1009207079038502874#33": {
+    "kind": "log",
+    "text": "2008-11-10T10:36:33+00:00 INFO dfs.FSDataset: Deleting block blk_-1009207079038502874 file /mnt/hadoop/dfs/data/current/subdir38/blk_-1009207079038502874"
+   },
+   "RB-003#Symptom": {
+    "kind": "runbook",
+    "text": "Unplanned re-replication activity - Symptom: NameNode lines `ask <dn> to replicate blk_... to datanode(s) <dn2>` followed by `Starting thread to transfer block` and `Transmitted block` show the cluster copying a block because it fell below its replication target."
+   },
+   "RB-015#Fix": {
+    "kind": "runbook",
+    "text": "Decommissioning DataNode stuck - Fix: Wait for replication to finish or close the blocking files."
+   },
+   "RB-004#Fix": {
+    "kind": "runbook",
+    "text": "Block reported that belongs to no file - Fix: The NameNode instructs the DataNode to delete the orphan replica. No manual action is needed unless the reports keep coming."
+   },
+   "RB-003#Checks": {
+    "kind": "runbook",
+    "text": "Unplanned re-replication activity - Checks: 1. Check which DataNode last held the block and whether it restarted recently.\n2. Look for earlier write exceptions for the same block (see RB-002).\n3. Check the replication queue size and whether transfers are keeping up."
+   },
+   "RB-003#Fix": {
+    "kind": "runbook",
+    "text": "Unplanned re-replication activity - Fix: Let the replication monitor finish. If transfers are slow, raise the replication stream limits temporarily. Confirm the block returns to its target replication count."
+   },
+   "metric:datanode/delete_errors_per_min": {
+    "kind": "metric",
+    "text": "datanode/delete_errors_per_min (derived-from-logs): max 50.0 at 2008-11-10T02:07:00+00:00, mean 0.42 over the window"
+   },
+   "metric:datanode/disk_util_pct": {
+    "kind": "metric",
+    "text": "datanode/disk_util_pct (simulated): max 75.2 at 2008-11-10T01:10:00+00:00, mean 56.54 over the window"
+   },
+   "metric:datanode/empty_packets_per_min": {
+    "kind": "metric",
+    "text": "datanode/empty_packets_per_min (derived-from-logs): max 3.0 at 2008-11-10T01:24:00+00:00, mean 0.15 over the window"
+   },
+   "metric:datanode/write_exceptions_per_min": {
+    "kind": "metric",
+    "text": "datanode/write_exceptions_per_min (derived-from-logs): max 20.0 at 2008-11-10T01:05:00+00:00, mean 5.43 over the window"
+   },
+   "metric:namenode/redundant_reports_per_min": {
+    "kind": "metric",
+    "text": "namenode/redundant_reports_per_min (derived-from-logs): max 5.0 at 2008-11-10T01:26:00+00:00, mean 0.52 over the window"
+   },
+   "metric:namenode/replication_requests_per_min": {
+    "kind": "metric",
+    "text": "namenode/replication_requests_per_min (derived-from-logs): max 4.0 at 2008-11-10T01:14:00+00:00, mean 0.40 over the window"
+   }
+  },
+  "seconds": 138.2,
+  "model": "qwen3.5:4b",
+  "expected_runbook": "RB-003"
+ },
+ "blk_-1001299764911418845": {
+  "block_id": "blk_-1001299764911418845",
+  "label": "Anomaly",
+  "postmortem": {
+   "root_cause": "Block blk_-1001299764911418845 was reported as belonging to no file, indicating metadata inconsistency or a failed write job.",
+   "runbook_id": "RB-004",
+   "summary": "A block was successfully created and replicated across multiple DataNodes, but later reports indicated it did not belong to any file. The block was eventually added to the invalidSet and deleted from the filesystem. This suggests a failure in the writing job or metadata tracking that resulted in an orphaned block report.",
+   "timeline": [
+    "2008-11-09T21:16:57+00:00: Block blk_-1001299764911418845 was allocated and received from multiple DataNodes (blk_-1001299764911418845#1, blk_-1001299764911418845#2).",
+    "2008-11-09T21:17:46+00:00: Block was added to the blockMap by multiple DataNodes (blk_-1001299764911418845#5, blk_-1001299764911418845#8).",
+    "2008-11-09T21:41:34+00:00: A rare warning occurred where a DataNode reported an exception while serving the block (blk_-1001299764911418845#14).",
+    "2008-11-10T10:31:09+00:00: The block was added to the invalidSet by multiple DataNodes (blk_-1001299764911418845#18, blk_-1001299764911418845#19).",
+    "2008-11-10T10:46:29+00:00: A rare log entry confirmed the block did not belong to any file (blk_-1001299764911418845#23)."
+   ],
+   "recommended_actions": [
+    "Investigate writing jobs around 2008-11-09T21:16:57+00:00 to see if they were cancelled or failed.",
+    "Review NameNode logs for any metadata corruption events during the block's lifecycle.",
+    "Monitor for a surge in orphan block reports to determine if this was an isolated incident or part of a larger namespace issue."
+   ],
+   "key_evidence_id": "blk_-1001299764911418845#23",
+   "key_evidence_quote": "addStoredBlock request received for blk_-1001299764911418845 on 10.251.106.10:50010 size 67108864 But it does not belong to any file.",
+   "citations": [
+    "blk_-1001299764911418845#23",
+    "RB-004#Symptom"
+   ]
+  },
+  "verification": {
+   "ok": true,
+   "reason": "all citations resolve to retrieved evidence",
+   "unknown": [],
+   "counts": {
+    "log": 1,
+    "runbook": 1
+   }
+  },
+  "drafts": 1,
+  "notes": [],
+  "trace": [
+   {
+    "server": "logs-db",
+    "tool": "get_block_events",
+    "args": {
+     "block_id": "blk_-1001299764911418845",
+     "limit": 60
+    },
+    "rows": 25,
+    "ms": 311
+   },
+   {
+    "server": "logs-db",
+    "tool": "get_block_label",
+    "args": {
+     "block_id": "blk_-1001299764911418845"
+    },
+    "rows": 2,
+    "ms": 67
+   },
+   {
+    "server": "logs-db",
+    "tool": "get_unusual_events",
+    "args": {
+     "block_id": "blk_-1001299764911418845",
+     "top": 3
+    },
+    "rows": 3,
+    "ms": 166
+   },
+   {
+    "server": "metrics",
+    "tool": "list_metrics",
+    "args": {},
+    "rows": 9,
+    "ms": 172
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "BLOCK* NameSystem.addStoredBlock: addStoredBlock request received for  on  size  But it does not belong to any file.",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 22772
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "Verification succeeded for",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 2256
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "NameSystem.addStoredBlock: addStoredBlock request received for blk_-1001299764911418845 on 10.251.106.10:50010 size 67108864 But it does not belong to an",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 3101
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "delete_errors_per_min",
+     "start": "2008-11-09T21:06:57+00:00",
+     "end": "2008-11-10T11:00:48+00:00"
+    },
+    "rows": 8,
+    "ms": 1016
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "empty_packets_per_min",
+     "start": "2008-11-09T21:06:57+00:00",
+     "end": "2008-11-10T11:00:48+00:00"
+    },
+    "rows": 8,
+    "ms": 59
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "write_exceptions_per_min",
+     "start": "2008-11-09T21:06:57+00:00",
+     "end": "2008-11-10T11:00:48+00:00"
+    },
+    "rows": 8,
+    "ms": 39
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "orphan_block_reports_per_min",
+     "start": "2008-11-09T21:06:57+00:00",
+     "end": "2008-11-10T11:00:48+00:00"
+    },
+    "rows": 8,
+    "ms": 25
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "redundant_reports_per_min",
+     "start": "2008-11-09T21:06:57+00:00",
+     "end": "2008-11-10T11:00:48+00:00"
+    },
+    "rows": 8,
+    "ms": 24
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "replication_requests_per_min",
+     "start": "2008-11-09T21:06:57+00:00",
+     "end": "2008-11-10T11:00:48+00:00"
+    },
+    "rows": 8,
+    "ms": 18
+   }
+  ],
+  "evidence": {
+   "blk_-1001299764911418845#1": {
+    "kind": "log",
+    "text": "2008-11-09T21:16:57+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.allocateBlock: /user/root/rand/_temporary/_task_200811092030_0001_m_001208_0/part-01208. blk_-1001299764911418845"
+   },
+   "blk_-1001299764911418845#2": {
+    "kind": "log",
+    "text": "2008-11-09T21:16:57+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1001299764911418845 src: /10.251.214.112:49376 dest: /10.251.214.112:50010"
+   },
+   "blk_-1001299764911418845#3": {
+    "kind": "log",
+    "text": "2008-11-09T21:16:57+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1001299764911418845 src: /10.251.127.47:35655 dest: /10.251.127.47:50010"
+   },
+   "blk_-1001299764911418845#4": {
+    "kind": "log",
+    "text": "2008-11-09T21:16:57+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1001299764911418845 src: /10.251.127.47:52940 dest: /10.251.127.47:50010"
+   },
+   "blk_-1001299764911418845#5": {
+    "kind": "log",
+    "text": "2008-11-09T21:17:46+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.106.10:50010 is added to blk_-1001299764911418845 size 67108864"
+   },
+   "blk_-1001299764911418845#6": {
+    "kind": "log",
+    "text": "2008-11-09T21:17:46+00:00 INFO dfs.DataNode$PacketResponder: PacketResponder 0 for block blk_-1001299764911418845 terminating"
+   },
+   "blk_-1001299764911418845#7": {
+    "kind": "log",
+    "text": "2008-11-09T21:17:46+00:00 INFO dfs.DataNode$PacketResponder: Received block blk_-1001299764911418845 of size 67108864 from /10.251.214.112"
+   },
+   "blk_-1001299764911418845#8": {
+    "kind": "log",
+    "text": "2008-11-09T21:17:47+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.214.112:50010 is added to blk_-1001299764911418845 size 67108864"
+   },
+   "blk_-1001299764911418845#9": {
+    "kind": "log",
+    "text": "2008-11-09T21:17:47+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.127.47:50010 is added to blk_-1001299764911418845 size 67108864"
+   },
+   "blk_-1001299764911418845#10": {
+    "kind": "log",
+    "text": "2008-11-09T21:17:47+00:00 INFO dfs.DataNode$PacketResponder: PacketResponder 1 for block blk_-1001299764911418845 terminating"
+   },
+   "blk_-1001299764911418845#11": {
+    "kind": "log",
+    "text": "2008-11-09T21:17:47+00:00 INFO dfs.DataNode$PacketResponder: Received block blk_-1001299764911418845 of size 67108864 from /10.251.127.47"
+   },
+   "blk_-1001299764911418845#12": {
+    "kind": "log",
+    "text": "2008-11-09T21:17:47+00:00 INFO dfs.DataNode$PacketResponder: PacketResponder 2 for block blk_-1001299764911418845 terminating"
+   },
+   "blk_-1001299764911418845#13": {
+    "kind": "log",
+    "text": "2008-11-09T21:17:47+00:00 INFO dfs.DataNode$PacketResponder: Received block blk_-1001299764911418845 of size 67108864 from /10.251.127.47"
+   },
+   "blk_-1001299764911418845#14": {
+    "kind": "log",
+    "text": "2008-11-09T21:41:34+00:00 WARN dfs.DataNode$DataXceiver: 10.251.127.47:50010:Got exception while serving blk_-1001299764911418845 to /10.251.127.47:"
+   },
+   "blk_-1001299764911418845#15": {
+    "kind": "log",
+    "text": "2008-11-09T21:41:41+00:00 INFO dfs.DataNode$DataXceiver: 10.251.127.47:50010 Served block blk_-1001299764911418845 to /10.251.127.47"
+   },
+   "blk_-1001299764911418845#16": {
+    "kind": "log",
+    "text": "2008-11-09T22:23:48+00:00 WARN dfs.DataNode$DataXceiver: 10.251.127.47:50010:Got exception while serving blk_-1001299764911418845 to /10.251.43.147:"
+   },
+   "blk_-1001299764911418845#17": {
+    "kind": "log",
+    "text": "2008-11-10T03:16:38+00:00 INFO dfs.DataBlockScanner: Verification succeeded for blk_-1001299764911418845"
+   },
+   "blk_-1001299764911418845#18": {
+    "kind": "log",
+    "text": "2008-11-10T10:31:09+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_-1001299764911418845 is added to invalidSet of 10.251.106.10:50010"
+   },
+   "blk_-1001299764911418845#19": {
+    "kind": "log",
+    "text": "2008-11-10T10:31:09+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_-1001299764911418845 is added to invalidSet of 10.251.127.47:50010"
+   },
+   "blk_-1001299764911418845#20": {
+    "kind": "log",
+    "text": "2008-11-10T10:31:09+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_-1001299764911418845 is added to invalidSet of 10.251.214.112:50010"
+   },
+   "blk_-1001299764911418845#21": {
+    "kind": "log",
+    "text": "2008-11-10T10:35:39+00:00 INFO dfs.FSDataset: Deleting block blk_-1001299764911418845 file /mnt/hadoop/dfs/data/current/subdir12/blk_-1001299764911418845"
+   },
+   "blk_-1001299764911418845#22": {
+    "kind": "log",
+    "text": "2008-11-10T10:35:47+00:00 INFO dfs.FSDataset: Deleting block blk_-1001299764911418845 file /mnt/hadoop/dfs/data/current/subdir36/blk_-1001299764911418845"
+   },
+   "blk_-1001299764911418845#23": {
+    "kind": "log",
+    "text": "2008-11-10T10:46:29+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: addStoredBlock request received for blk_-1001299764911418845 on 10.251.106.10:50010 size 67108864 But it does not belong to any file."
+   },
+   "blk_-1001299764911418845#24": {
+    "kind": "log",
+    "text": "2008-11-10T10:46:29+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.106.10:50010 is added to blk_-1001299764911418845 size 67108864"
+   },
+   "blk_-1001299764911418845#25": {
+    "kind": "log",
+    "text": "2008-11-10T10:50:48+00:00 INFO dfs.FSDataset: Deleting block blk_-1001299764911418845 file /mnt/hadoop/dfs/data/current/subdir61/blk_-1001299764911418845"
+   },
+   "RB-004#Symptom": {
+    "kind": "runbook",
+    "text": "Block reported that belongs to no file - Symptom: The NameNode logs `addStoredBlock request received for blk_... on <dn> size <n> But it does not belong to any file.` when a DataNode reports a block the NameNode has no file for."
+   },
+   "RB-004#Checks": {
+    "kind": "runbook",
+    "text": "Block reported that belongs to no file - Checks: 1. Look for `NameSystem.delete` lines that mention the same block close in time.\n2. Check whether the writing job was cancelled or failed.\n3. Confirm whether the block later appears in an invalidSet."
+   },
+   "RB-004#Escalate": {
+    "kind": "runbook",
+    "text": "Block reported that belongs to no file - Escalate: Escalate if orphan reports are numerous, since that can mean namespace metadata was lost."
+   },
+   "RB-011#Symptom": {
+    "kind": "runbook",
+    "text": "Corrupt block replica - Symptom: A replica fails checksum verification during a read or the block scanner."
+   },
+   "RB-012#Fix": {
+    "kind": "runbook",
+    "text": "Block scanner and read errors while serving - Fix: Usually client-side and safe to ignore in small numbers. Investigate when rates rise."
+   },
+   "RB-005#Escalate": {
+    "kind": "runbook",
+    "text": "Redundant addStoredBlock requests - Escalate: Escalate if the NameNode RPC queue is backing up."
+   },
+   "RB-005#Checks": {
+    "kind": "runbook",
+    "text": "Redundant addStoredBlock requests - Checks: 1. Check NameNode RPC latency around the report time.\n2. See whether the DataNode restarted or re-registered recently."
+   },
+   "metric:datanode/delete_errors_per_min": {
+    "kind": "metric",
+    "text": "datanode/delete_errors_per_min (derived-from-logs): max 82.0 at 2008-11-09T21:38:00+00:00, mean 0.68 over the window"
+   },
+   "metric:datanode/empty_packets_per_min": {
+    "kind": "metric",
+    "text": "datanode/empty_packets_per_min (derived-from-logs): max 9.0 at 2008-11-09T21:20:00+00:00, mean 0.85 over the window"
+   },
+   "metric:datanode/write_exceptions_per_min": {
+    "kind": "metric",
+    "text": "datanode/write_exceptions_per_min (derived-from-logs): max 11.0 at 2008-11-09T21:09:00+00:00, mean 1.24 over the window"
+   },
+   "metric:namenode/orphan_block_reports_per_min": {
+    "kind": "metric",
+    "text": "namenode/orphan_block_reports_per_min (derived-from-logs): max 3.0 at 2008-11-09T21:38:00+00:00, mean 0.03 over the window"
+   },
+   "metric:namenode/redundant_reports_per_min": {
+    "kind": "metric",
+    "text": "namenode/redundant_reports_per_min (derived-from-logs): max 6.0 at 2008-11-09T21:26:00+00:00, mean 0.17 over the window"
+   },
+   "metric:namenode/replication_requests_per_min": {
+    "kind": "metric",
+    "text": "namenode/replication_requests_per_min (derived-from-logs): max 14.0 at 2008-11-09T21:32:00+00:00, mean 0.93 over the window"
+   }
+  },
+  "seconds": 123.5,
+  "model": "qwen3.5:4b",
+  "expected_runbook": "RB-004"
+ },
+ "blk_-1014865944005847876": {
+  "block_id": "blk_-1014865944005847876",
+  "label": "Anomaly",
+  "postmortem": {
+   "root_cause": "Redundant addStoredBlock request received for blk_-1014865944005847876 on 10.251.123.195:50010 size 67108864",
+   "runbook_id": "RB-005",
+   "summary": "A block report for blk_-1014865944005847876 was received multiple times from the same DataNode, 10.251.123.195:50010. The NameNode logged a warning indicating this redundant request occurred after it had already recorded the replica for that block.",
+   "timeline": [
+    "2008-11-09T23:37:21+00:00 Block blk_-1014865944005847876 allocated and received from 10.251.194.245 [blk_-1014865944005847876#2]",
+    "2008-11-09T23:37:21+00:00 Block blk_-1014865944005847876 received from 10.251.123.195 [blk_-1014865944005847876#3]",
+    "2008-11-09T23:37:49+00:00 Block blk_-1014865944005847876 received from 10.251.123.195 again [blk_-1014865944005847876#10]",
+    "2008-11-09T23:37:53+00:00 Redundant addStoredBlock request received for blk_-1014865944005847876 on 10.251.123.195:50010 [blk_-1014865944005847876#14]",
+    "2008-11-10T10:31:33+00:00 Block blk_-1014865944005847876 added to invalidSet [blk_-1014865944005847876#15]",
+    "2008-11-10T10:35:31+00:00 Block blk_-1014865944005847876 deleted from file system [blk_-1014865944005847876#18]"
+   ],
+   "recommended_actions": [
+    "Monitor NameNode RPC latency around the time of block reports to identify potential queue backlogs.",
+    "Check whether the DataNode 10.251.123.195 restarted or re-registered recently before the redundant report."
+   ],
+   "key_evidence_id": "blk_-1014865944005847876#14",
+   "key_evidence_quote": "Redundant addStoredBlock request received for blk_-1014865944005847876 on 10.251.123.195:50010 size 67108864",
+   "citations": [
+    "blk_-1014865944005847876#14",
+    "RB-005#Symptom"
+   ]
+  },
+  "verification": {
+   "ok": true,
+   "reason": "all citations resolve to retrieved evidence",
+   "unknown": [],
+   "counts": {
+    "log": 1,
+    "runbook": 1
+   }
+  },
+  "drafts": 1,
+  "notes": [],
+  "trace": [
+   {
+    "server": "logs-db",
+    "tool": "get_block_events",
+    "args": {
+     "block_id": "blk_-1014865944005847876",
+     "limit": 60
+    },
+    "rows": 20,
+    "ms": 344
+   },
+   {
+    "server": "logs-db",
+    "tool": "get_block_label",
+    "args": {
+     "block_id": "blk_-1014865944005847876"
+    },
+    "rows": 2,
+    "ms": 35
+   },
+   {
+    "server": "logs-db",
+    "tool": "get_unusual_events",
+    "args": {
+     "block_id": "blk_-1014865944005847876",
+     "top": 3
+    },
+    "rows": 1,
+    "ms": 100
+   },
+   {
+    "server": "metrics",
+    "tool": "list_metrics",
+    "args": {},
+    "rows": 9,
+    "ms": 105
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "BLOCK* NameSystem.addStoredBlock: Redundant addStoredBlock request received for  on  size",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 26469
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "Redundant addStoredBlock request received",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 2131
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "blockMap updated: Redundant addStoredBlock request",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 2426
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "delete_errors_per_min",
+     "start": "2008-11-09T23:27:21+00:00",
+     "end": "2008-11-10T10:49:08+00:00"
+    },
+    "rows": 8,
+    "ms": 4082
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "empty_packets_per_min",
+     "start": "2008-11-09T23:27:21+00:00",
+     "end": "2008-11-10T10:49:08+00:00"
+    },
+    "rows": 8,
+    "ms": 53
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "write_exceptions_per_min",
+     "start": "2008-11-09T23:27:21+00:00",
+     "end": "2008-11-10T10:49:08+00:00"
+    },
+    "rows": 8,
+    "ms": 23
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "orphan_block_reports_per_min",
+     "start": "2008-11-09T23:27:21+00:00",
+     "end": "2008-11-10T10:49:08+00:00"
+    },
+    "rows": 8,
+    "ms": 36
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "redundant_reports_per_min",
+     "start": "2008-11-09T23:27:21+00:00",
+     "end": "2008-11-10T10:49:08+00:00"
+    },
+    "rows": 8,
+    "ms": 35
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "replication_requests_per_min",
+     "start": "2008-11-09T23:27:21+00:00",
+     "end": "2008-11-10T10:49:08+00:00"
+    },
+    "rows": 8,
+    "ms": 22
+   }
+  ],
+  "evidence": {
+   "blk_-1014865944005847876#1": {
+    "kind": "log",
+    "text": "2008-11-09T23:37:21+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.allocateBlock: /user/root/sortrand/_temporary/_task_200811092030_0002_r_000113_0/part-00113. blk_-1014865944005847876"
+   },
+   "blk_-1014865944005847876#2": {
+    "kind": "log",
+    "text": "2008-11-09T23:37:21+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1014865944005847876 src: /10.251.194.245:40503 dest: /10.251.194.245:50010"
+   },
+   "blk_-1014865944005847876#3": {
+    "kind": "log",
+    "text": "2008-11-09T23:37:21+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1014865944005847876 src: /10.251.123.195:56127 dest: /10.251.123.195:50010"
+   },
+   "blk_-1014865944005847876#4": {
+    "kind": "log",
+    "text": "2008-11-09T23:37:21+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1014865944005847876 src: /10.251.123.195:42501 dest: /10.251.123.195:50010"
+   },
+   "blk_-1014865944005847876#5": {
+    "kind": "log",
+    "text": "2008-11-09T23:37:49+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.194.245:50010 is added to blk_-1014865944005847876 size 67108864"
+   },
+   "blk_-1014865944005847876#6": {
+    "kind": "log",
+    "text": "2008-11-09T23:37:49+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.250.15.198:50010 is added to blk_-1014865944005847876 size 67108864"
+   },
+   "blk_-1014865944005847876#7": {
+    "kind": "log",
+    "text": "2008-11-09T23:37:49+00:00 INFO dfs.DataNode$PacketResponder: PacketResponder 0 for block blk_-1014865944005847876 terminating"
+   },
+   "blk_-1014865944005847876#8": {
+    "kind": "log",
+    "text": "2008-11-09T23:37:49+00:00 INFO dfs.DataNode$PacketResponder: Received block blk_-1014865944005847876 of size 67108864 from /10.251.194.245"
+   },
+   "blk_-1014865944005847876#9": {
+    "kind": "log",
+    "text": "2008-11-09T23:37:49+00:00 INFO dfs.DataNode$PacketResponder: PacketResponder 2 for block blk_-1014865944005847876 terminating"
+   },
+   "blk_-1014865944005847876#10": {
+    "kind": "log",
+    "text": "2008-11-09T23:37:49+00:00 INFO dfs.DataNode$PacketResponder: Received block blk_-1014865944005847876 of size 67108864 from /10.251.123.195"
+   },
+   "blk_-1014865944005847876#11": {
+    "kind": "log",
+    "text": "2008-11-09T23:37:49+00:00 INFO dfs.DataNode$PacketResponder: PacketResponder 1 for block blk_-1014865944005847876 terminating"
+   },
+   "blk_-1014865944005847876#12": {
+    "kind": "log",
+    "text": "2008-11-09T23:37:49+00:00 INFO dfs.DataNode$PacketResponder: Received block blk_-1014865944005847876 of size 67108864 from /10.251.123.195"
+   },
+   "blk_-1014865944005847876#13": {
+    "kind": "log",
+    "text": "2008-11-09T23:37:53+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.123.195:50010 is added to blk_-1014865944005847876 size 67108864"
+   },
+   "blk_-1014865944005847876#14": {
+    "kind": "log",
+    "text": "2008-11-09T23:37:53+00:00 WARN dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: Redundant addStoredBlock request received for blk_-1014865944005847876 on 10.251.123.195:50010 size 67108864"
+   },
+   "blk_-1014865944005847876#15": {
+    "kind": "log",
+    "text": "2008-11-10T10:31:33+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_-1014865944005847876 is added to invalidSet of 10.250.15.198:50010"
+   },
+   "blk_-1014865944005847876#16": {
+    "kind": "log",
+    "text": "2008-11-10T10:31:33+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_-1014865944005847876 is added to invalidSet of 10.251.123.195:50010"
+   },
+   "blk_-1014865944005847876#17": {
+    "kind": "log",
+    "text": "2008-11-10T10:31:33+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_-1014865944005847876 is added to invalidSet of 10.251.194.245:50010"
+   },
+   "blk_-1014865944005847876#18": {
+    "kind": "log",
+    "text": "2008-11-10T10:35:31+00:00 INFO dfs.FSDataset: Deleting block blk_-1014865944005847876 file /mnt/hadoop/dfs/data/current/subdir15/blk_-1014865944005847876"
+   },
+   "blk_-1014865944005847876#19": {
+    "kind": "log",
+    "text": "2008-11-10T10:36:46+00:00 INFO dfs.FSDataset: Deleting block blk_-1014865944005847876 file /mnt/hadoop/dfs/data/current/subdir17/blk_-1014865944005847876"
+   },
+   "blk_-1014865944005847876#20": {
+    "kind": "log",
+    "text": "2008-11-10T10:39:08+00:00 INFO dfs.FSDataset: Deleting block blk_-1014865944005847876 file /mnt/hadoop/dfs/data/current/subdir11/blk_-1014865944005847876"
+   },
+   "RB-005#Symptom": {
+    "kind": "runbook",
+    "text": "Redundant addStoredBlock requests - Symptom: `Redundant addStoredBlock request received for blk_... on <dn> size <n>` means a DataNode reported a replica the NameNode already has recorded on that node."
+   },
+   "RB-004#Symptom": {
+    "kind": "runbook",
+    "text": "Block reported that belongs to no file - Symptom: The NameNode logs `addStoredBlock request received for blk_... on <dn> size <n> But it does not belong to any file.` when a DataNode reports a block the NameNode has no file for."
+   },
+   "RB-005#Likely causes": {
+    "kind": "runbook",
+    "text": "Redundant addStoredBlock requests - Likely causes: - A block report overlapped with the incremental report for the same replica.\n- A retried report after a slow NameNode response.\n- A DataNode restart that re-sent reports."
+   },
+   "RB-005#Checks": {
+    "kind": "runbook",
+    "text": "Redundant addStoredBlock requests - Checks: 1. Check NameNode RPC latency around the report time.\n2. See whether the DataNode restarted or re-registered recently."
+   },
+   "RB-005#Escalate": {
+    "kind": "runbook",
+    "text": "Redundant addStoredBlock requests - Escalate: Escalate if the NameNode RPC queue is backing up."
+   },
+   "metric:datanode/delete_errors_per_min": {
+    "kind": "metric",
+    "text": "datanode/delete_errors_per_min (derived-from-logs): max 5.0 at 2008-11-10T01:01:00+00:00, mean 0.04 over the window"
+   },
+   "metric:datanode/empty_packets_per_min": {
+    "kind": "metric",
+    "text": "datanode/empty_packets_per_min (derived-from-logs): max 3.0 at 2008-11-10T00:10:00+00:00, mean 0.07 over the window"
+   },
+   "metric:datanode/write_exceptions_per_min": {
+    "kind": "metric",
+    "text": "datanode/write_exceptions_per_min (derived-from-logs): max 20.0 at 2008-11-10T01:05:00+00:00, mean 5.11 over the window"
+   },
+   "metric:namenode/orphan_block_reports_per_min": {
+    "kind": "metric",
+    "text": "namenode/orphan_block_reports_per_min (derived-from-logs): max 2.0 at 2008-11-10T01:01:00+00:00, mean 0.03 over the window"
+   },
+   "metric:namenode/redundant_reports_per_min": {
+    "kind": "metric",
+    "text": "namenode/redundant_reports_per_min (derived-from-logs): max 5.0 at 2008-11-09T23:52:00+00:00, mean 0.89 over the window"
+   },
+   "metric:namenode/replication_requests_per_min": {
+    "kind": "metric",
+    "text": "namenode/replication_requests_per_min (derived-from-logs): max 5.0 at 2008-11-10T01:02:00+00:00, mean 0.17 over the window"
+   }
+  },
+  "seconds": 104.0,
+  "model": "qwen3.5:4b",
+  "expected_runbook": "RB-005"
+ },
+ "blk_-1018884555287540953": {
+  "block_id": "blk_-1018884555287540953",
+  "label": "Anomaly",
+  "postmortem": {
+   "root_cause": "Empty packet received during block write caused by a client closing or flushing the stream without data, as indicated by the (RARE) log entry.",
+   "runbook_id": "RB-006",
+   "summary": "A DataNode received an empty packet while writing block blk_-1018884555287540953, triggering a (RARE) warning. The write pipeline eventually completed with data from other nodes, but the initial empty packet was logged as a rare event. Subsequent cleanup operations marked the block as invalid across multiple DataNodes before final deletion.",
+   "timeline": [
+    "2008-11-09T21:22:06+00:00: (RARE) Empty packet received for block blk_-1018884555287540953 [blk_-1018884555287540953#6]",
+    "2008-11-09T21:22:06+00:00: PacketResponder 0 terminated after empty packet [blk_-1018884555287540953#7]",
+    "2008-11-09T21:22:07+00:00: DataNode received actual data for block blk_-1018884555287540953 [blk_-1018884555287540953#12]",
+    "2008-11-10T10:31:12+00:00: Block marked as invalid across multiple DataNodes [blk_-1018884555287540953#18]",
+    "2008-11-10T10:36:02+00:00: Final deletion of block file completed [blk_-1018884555287540953#23]"
+   ],
+   "recommended_actions": [
+    "Replace or exclude the slow node from pipelines, and fix the disk or network cause [RB-009#Fix]",
+    "Check the client that opened the pipeline and whether the write later completed [RB-006#Checks]",
+    "Look for pipeline errors before or after the empty packet to identify root cause [RB-006#Checks]"
+   ],
+   "key_evidence_id": "blk_-1018884555287540953#6",
+   "key_evidence_quote": "Receiving empty packet for block blk_-1018884555287540953",
+   "citations": [
+    "blk_-1018884555287540953#6",
+    "RB-006#Likely causes"
+   ]
+  },
+  "verification": {
+   "ok": true,
+   "reason": "all citations resolve to retrieved evidence",
+   "unknown": [],
+   "counts": {
+    "log": 1,
+    "runbook": 1
+   }
+  },
+  "drafts": 1,
+  "notes": [],
+  "trace": [
+   {
+    "server": "logs-db",
+    "tool": "get_block_events",
+    "args": {
+     "block_id": "blk_-1018884555287540953",
+     "limit": 60
+    },
+    "rows": 23,
+    "ms": 340
+   },
+   {
+    "server": "logs-db",
+    "tool": "get_block_label",
+    "args": {
+     "block_id": "blk_-1018884555287540953"
+    },
+    "rows": 2,
+    "ms": 24
+   },
+   {
+    "server": "logs-db",
+    "tool": "get_unusual_events",
+    "args": {
+     "block_id": "blk_-1018884555287540953",
+     "top": 3
+    },
+    "rows": 3,
+    "ms": 39
+   },
+   {
+    "server": "metrics",
+    "tool": "list_metrics",
+    "args": {},
+    "rows": 9,
+    "ms": 152
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "Receiving empty packet for block",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 24445
+   },
+   {
+    "server": "kb",
+    "tool": "search_runbooks",
+    "args": {
+     "query": "PacketResponder terminating",
+     "k": 3
+    },
+    "rows": 3,
+    "ms": 2064
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "delete_errors_per_min",
+     "start": "2008-11-09T21:12:04+00:00",
+     "end": "2008-11-10T10:46:02+00:00"
+    },
+    "rows": 8,
+    "ms": 338
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "empty_packets_per_min",
+     "start": "2008-11-09T21:12:04+00:00",
+     "end": "2008-11-10T10:46:02+00:00"
+    },
+    "rows": 8,
+    "ms": 26
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "datanode",
+     "metric": "write_exceptions_per_min",
+     "start": "2008-11-09T21:12:04+00:00",
+     "end": "2008-11-10T10:46:02+00:00"
+    },
+    "rows": 8,
+    "ms": 21
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "orphan_block_reports_per_min",
+     "start": "2008-11-09T21:12:04+00:00",
+     "end": "2008-11-10T10:46:02+00:00"
+    },
+    "rows": 8,
+    "ms": 21
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "redundant_reports_per_min",
+     "start": "2008-11-09T21:12:04+00:00",
+     "end": "2008-11-10T10:46:02+00:00"
+    },
+    "rows": 8,
+    "ms": 15
+   },
+   {
+    "server": "metrics",
+    "tool": "get_metric",
+    "args": {
+     "service": "namenode",
+     "metric": "replication_requests_per_min",
+     "start": "2008-11-09T21:12:04+00:00",
+     "end": "2008-11-10T10:46:02+00:00"
+    },
+    "rows": 8,
+    "ms": 15
+   }
+  ],
+  "evidence": {
+   "blk_-1018884555287540953#1": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:04+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.allocateBlock: /user/root/rand/_temporary/_task_200811092030_0001_m_001442_0/part-01442. blk_-1018884555287540953"
+   },
+   "blk_-1018884555287540953#2": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:05+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1018884555287540953 src: /10.251.121.224:54393 dest: /10.251.121.224:50010"
+   },
+   "blk_-1018884555287540953#3": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:05+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1018884555287540953 src: /10.250.7.146:47907 dest: /10.250.7.146:50010"
+   },
+   "blk_-1018884555287540953#4": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:05+00:00 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1018884555287540953 src: /10.250.7.146:58687 dest: /10.250.7.146:50010"
+   },
+   "blk_-1018884555287540953#5": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:06+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.250.7.230:50010 is added to blk_-1018884555287540953 size 3538651"
+   },
+   "blk_-1018884555287540953#6": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:06+00:00 INFO dfs.DataNode$BlockReceiver: Receiving empty packet for block blk_-1018884555287540953"
+   },
+   "blk_-1018884555287540953#7": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:06+00:00 INFO dfs.DataNode$PacketResponder: PacketResponder 0 for block blk_-1018884555287540953 terminating"
+   },
+   "blk_-1018884555287540953#8": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:06+00:00 INFO dfs.DataNode$PacketResponder: Received block blk_-1018884555287540953 of size 3538651 from /10.251.121.224"
+   },
+   "blk_-1018884555287540953#9": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:06+00:00 INFO dfs.DataNode$BlockReceiver: Receiving empty packet for block blk_-1018884555287540953"
+   },
+   "blk_-1018884555287540953#10": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:06+00:00 INFO dfs.DataNode$BlockReceiver: Receiving empty packet for block blk_-1018884555287540953"
+   },
+   "blk_-1018884555287540953#11": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:06+00:00 INFO dfs.DataNode$PacketResponder: PacketResponder 1 for block blk_-1018884555287540953 terminating"
+   },
+   "blk_-1018884555287540953#12": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:06+00:00 INFO dfs.DataNode$PacketResponder: Received block blk_-1018884555287540953 of size 3538651 from /10.250.7.146"
+   },
+   "blk_-1018884555287540953#13": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:07+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.121.224:50010 is added to blk_-1018884555287540953 size 3538651"
+   },
+   "blk_-1018884555287540953#14": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:07+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.250.7.146:50010 is added to blk_-1018884555287540953 size 3538651"
+   },
+   "blk_-1018884555287540953#15": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:07+00:00 INFO dfs.DataNode$PacketResponder: PacketResponder 2 for block blk_-1018884555287540953 terminating"
+   },
+   "blk_-1018884555287540953#16": {
+    "kind": "log",
+    "text": "2008-11-09T21:22:07+00:00 INFO dfs.DataNode$PacketResponder: Received block blk_-1018884555287540953 of size 3538651 from /10.250.7.146"
+   },
+   "blk_-1018884555287540953#17": {
+    "kind": "log",
+    "text": "2008-11-09T21:40:38+00:00 INFO dfs.DataNode$DataXceiver: 10.251.121.224:50010 Served block blk_-1018884555287540953 to /10.251.121.224"
+   },
+   "blk_-1018884555287540953#18": {
+    "kind": "log",
+    "text": "2008-11-10T10:31:12+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_-1018884555287540953 is added to invalidSet of 10.250.7.146:50010"
+   },
+   "blk_-1018884555287540953#19": {
+    "kind": "log",
+    "text": "2008-11-10T10:31:12+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_-1018884555287540953 is added to invalidSet of 10.250.7.230:50010"
+   },
+   "blk_-1018884555287540953#20": {
+    "kind": "log",
+    "text": "2008-11-10T10:31:12+00:00 INFO dfs.FSNamesystem: BLOCK* NameSystem.delete: blk_-1018884555287540953 is added to invalidSet of 10.251.121.224:50010"
+   },
+   "blk_-1018884555287540953#21": {
+    "kind": "log",
+    "text": "2008-11-10T10:32:43+00:00 INFO dfs.FSDataset: Deleting block blk_-1018884555287540953 file /mnt/hadoop/dfs/data/current/subdir46/blk_-1018884555287540953"
+   },
+   "blk_-1018884555287540953#22": {
+    "kind": "log",
+    "text": "2008-11-10T10:35:59+00:00 INFO dfs.FSDataset: Deleting block blk_-1018884555287540953 file /mnt/hadoop/dfs/data/current/subdir4/blk_-1018884555287540953"
+   },
+   "blk_-1018884555287540953#23": {
+    "kind": "log",
+    "text": "2008-11-10T10:36:02+00:00 INFO dfs.FSDataset: Deleting block blk_-1018884555287540953 file /mnt/hadoop/dfs/data/current/subdir44/blk_-1018884555287540953"
+   },
+   "RB-006#Symptom": {
+    "kind": "runbook",
+    "text": "Empty packet in the write pipeline - Symptom: `Receiving empty packet for block blk_...` means a DataNode got a zero-length data packet in a write pipeline."
+   },
+   "RB-006#Likely causes": {
+    "kind": "runbook",
+    "text": "Empty packet in the write pipeline - Likely causes: - A client closed or flushed the stream without data after an aborted write.\n- A pipeline recovery sent a marker packet.\n- A client bug that emits empty packets."
+   },
+   "RB-006#Checks": {
+    "kind": "runbook",
+    "text": "Empty packet in the write pipeline - Checks: 1. Check the client that opened the pipeline and whether the write later completed.\n2. Look for pipeline errors before or after the empty packet (see RB-002)."
+   },
+   "RB-009#Fix": {
+    "kind": "runbook",
+    "text": "Slow PacketResponder acknowledgements - Fix: Replace or exclude the slow node from pipelines, and fix the disk or network cause."
+   },
+   "RB-009#Symptom": {
+    "kind": "runbook",
+    "text": "Slow PacketResponder acknowledgements - Symptom: A PacketResponder that is slow to acknowledge delays the whole write pipeline."
+   },
+   "RB-009#Escalate": {
+    "kind": "runbook",
+    "text": "Slow PacketResponder acknowledgements - Escalate: Escalate when write latency stays elevated across the cluster."
+   },
+   "metric:datanode/delete_errors_per_min": {
+    "kind": "metric",
+    "text": "datanode/delete_errors_per_min (derived-from-logs): max 82.0 at 2008-11-09T21:38:00+00:00, mean 0.68 over the window"
+   },
+   "metric:datanode/empty_packets_per_min": {
+    "kind": "metric",
+    "text": "datanode/empty_packets_per_min (derived-from-logs): max 9.0 at 2008-11-09T21:20:00+00:00, mean 0.70 over the window"
+   },
+   "metric:datanode/write_exceptions_per_min": {
+    "kind": "metric",
+    "text": "datanode/write_exceptions_per_min (derived-from-logs): max 9.0 at 2008-11-09T21:20:00+00:00, mean 0.88 over the window"
+   },
+   "metric:namenode/orphan_block_reports_per_min": {
+    "kind": "metric",
+    "text": "namenode/orphan_block_reports_per_min (derived-from-logs): max 3.0 at 2008-11-09T21:38:00+00:00, mean 0.03 over the window"
+   },
+   "metric:namenode/redundant_reports_per_min": {
+    "kind": "metric",
+    "text": "namenode/redundant_reports_per_min (derived-from-logs): max 6.0 at 2008-11-09T21:26:00+00:00, mean 0.16 over the window"
+   },
+   "metric:namenode/replication_requests_per_min": {
+    "kind": "metric",
+    "text": "namenode/replication_requests_per_min (derived-from-logs): max 14.0 at 2008-11-09T21:32:00+00:00, mean 0.72 over the window"
+   }
+  },
+  "seconds": 86.9,
+  "model": "qwen3.5:4b",
+  "expected_runbook": "RB-006"
+ }
+}

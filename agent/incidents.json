@@ -1,0 +1,50 @@
+[
+  {
+    "block_id": "blk_-1038022846623317329",
+    "expected_runbook": "RB-001",
+    "first_ts": "2008-11-11T04:39:26+00:00",
+    "last_ts": "2008-11-11T04:47:41+00:00",
+    "n_events": 20,
+    "signature_line": "Unexpected error trying to delete block blk_-1038022846623317329. BlockInfo not found in volumeMap."
+  },
+  {
+    "block_id": "blk_-1000723577943457888",
+    "expected_runbook": "RB-002",
+    "first_ts": "2008-11-11T08:17:14+00:00",
+    "last_ts": "2008-11-11T08:17:18+00:00",
+    "n_events": 4,
+    "signature_line": "writeBlock blk_-1000723577943457888 received exception java.io.IOException: Could not read from stream"
+  },
+  {
+    "block_id": "blk_-1009207079038502874",
+    "expected_runbook": "RB-003",
+    "first_ts": "2008-11-10T01:14:23+00:00",
+    "last_ts": "2008-11-10T10:36:33+00:00",
+    "n_events": 33,
+    "signature_line": "BLOCK* ask 10.251.122.79:50010 to replicate blk_-1009207079038502874 to datanode(s) 10.251.214.225:50010"
+  },
+  {
+    "block_id": "blk_-1001299764911418845",
+    "expected_runbook": "RB-004",
+    "first_ts": "2008-11-09T21:16:57+00:00",
+    "last_ts": "2008-11-10T10:50:48+00:00",
+    "n_events": 25,
+    "signature_line": "BLOCK* NameSystem.addStoredBlock: addStoredBlock request received for blk_-1001299764911418845 on 10.251.106.10:50010 size 67108864 But it does not belong to any file."
+  },
+  {
+    "block_id": "blk_-1014865944005847876",
+    "expected_runbook": "RB-005",
+    "first_ts": "2008-11-09T23:37:21+00:00",
+    "last_ts": "2008-11-10T10:39:08+00:00",
+    "n_events": 20,
+    "signature_line": "BLOCK* NameSystem.addStoredBlock: Redundant addStoredBlock request received for blk_-1014865944005847876 on 10.251.123.195:50010 size 67108864"
+  },
+  {
+    "block_id": "blk_-1018884555287540953",
+    "expected_runbook": "RB-006",
+    "first_ts": "2008-11-09T21:22:04+00:00",
+    "last_ts": "2008-11-10T10:36:02+00:00",
+    "n_events": 23,
+    "signature_line": "Receiving empty packet for block blk_-1018884555287540953"
+  }
+]
