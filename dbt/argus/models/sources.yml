@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: argus
+    description: Tables loaded by the Spark job and the Python scripts (see ingest/ and scripts/).
+    schema: public
+    tables:
+      - name: events
+        description: One row per parsed HDFS log line (11,175,629 rows in the full load).
+      - name: block_labels
+        description: Benchmark ground truth, one row per block (575,061 rows).
+      - name: template_stats
+        description: How many blocks each message template appears in.
+      - name: service_metrics
+        description: Per-minute service metrics (log-derived or simulated).

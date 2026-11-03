@@ -1,0 +1,10 @@
+component,plane
+dfs.FSNamesystem,Metadata plane
+dfs.FSDataset,Storage plane
+dfs.DataNode$DataXceiver,Storage plane
+dfs.DataNode$PacketResponder,Storage plane
+dfs.DataNode$DataTransfer,Replication plane
+dfs.DataNode$BlockReceiver,Storage plane
+dfs.DataNode,Storage plane
+dfs.DataBlockScanner,Housekeeping
+dfs.FSNamesystem$ReplicationMonitor,Replication plane

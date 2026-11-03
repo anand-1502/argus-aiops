@@ -1,0 +1,27 @@
+name: argus
+version: "1.0.0"
+config-version: 2
+profile: argus
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  argus:
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: table
+    marts:
+      +materialized: table
+seeds:
+  argus:
+    +schema: ref
+
+vars:
+  # Anomalous blocks that start within this many seconds of the previous one belong to one incident window.
+  # 30s is about the 99th percentile of gaps between anomalous block starts. The count is very sensitive to it,
+  # which is why mart_window_sensitivity publishes the whole curve next to the headline.
+  incident_gap_seconds: 30

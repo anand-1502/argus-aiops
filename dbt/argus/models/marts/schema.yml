@@ -1,0 +1,69 @@
+version: 2
+
+models:
+  - name: dim_block
+    description: One row per HDFS block with its benchmark label and life-cycle facts.
+    columns:
+      - name: block_id
+        tests: [unique, not_null]
+      - name: label
+        tests:
+          - not_null
+          - accepted_values: {values: ['Normal', 'Anomaly']}
+      - name: duration_bucket
+        tests:
+          - accepted_values: {values: ['under 1s', '1s to 1min', '1min to 1h', 'over 1h']}
+      - name: n_events
+        tests:
+          - dbt_utils_free_positive
+
+  - name: dim_component
+    columns:
+      - name: component
+        tests: [unique, not_null]
+      - name: component_key
+        tests: [unique, not_null]
+      - name: plane
+        tests: [not_null]
+
+  - name: dim_time_hour
+    columns:
+      - name: hour_ts
+        tests: [unique, not_null]
+
+  - name: fact_hourly_events
+    description: "Grain: hour x component x level."
+    columns:
+      - name: component
+        tests:
+          - relationships: {to: ref('dim_component'), field: component}
+      - name: hour_ts
+        tests:
+          - relationships: {to: ref('dim_time_hour'), field: hour_ts}
+      - name: level
+        tests:
+          - accepted_values: {values: ['INFO', 'WARN']}
+      - name: events
+        tests: [not_null]
+
+  - name: mart_anomaly_trend
+    columns:
+      - name: hour_ts
+        tests: [unique, not_null]
+
+  - name: mart_incident_windows
+    columns:
+      - name: window_id
+        tests: [unique, not_null]
+      - name: anomalous_blocks
+        tests:
+          - dbt_utils_free_positive
+
+  - name: mart_kpis
+    description: A single row of headline KPIs. Definitions are in docs/KPI_DICTIONARY.md.
+
+  - name: mart_window_sensitivity
+    description: Incident-window count for each candidate gap, so the headline can be judged against its parameter.
+    columns:
+      - name: gap_seconds
+        tests: [unique, not_null]

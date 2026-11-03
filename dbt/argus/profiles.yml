@@ -1,0 +1,13 @@
+# Connection settings come from the same environment variables as the rest of the project.
+argus:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('PGHOST', 'localhost') }}"
+      port: "{{ env_var('PGPORT', '5433') | as_number }}"
+      user: argus
+      password: "{{ env_var('POSTGRES_PASSWORD', 'argus') }}"
+      dbname: "{{ env_var('PGDATABASE', 'argus') }}"
+      schema: analytics
+      threads: 2
