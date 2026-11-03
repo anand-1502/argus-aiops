@@ -56,7 +56,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: "24", cache: npm, cache-dependency-path: web/package-lock.json}
       - run: npm ci
-      - run: npx tsc --noEmit
+      - run: npx next typegen && npx tsc --noEmit  # route types are generated, so a fresh checkout needs typegen first
       - run: npx eslint .
       - run: npm run build
       - name: Static demo site still builds

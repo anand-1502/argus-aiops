@@ -8,5 +8,5 @@ cd "$(dirname "$0")/.."
 export JAVA_HOME="${JAVA_HOME:-/opt/homebrew/opt/openjdk@17}"
 uv run pytest -q
 uv run pytest -q -m torch tests/test_kb.py tests/test_cluster.py
-if [[ -z "${SKIP_WEB:-}" ]]; then (cd web && npx tsc --noEmit && npx eslint . && echo "web: clean"); fi
+if [[ -z "${SKIP_WEB:-}" ]]; then (cd web && npx next typegen >/dev/null && npx tsc --noEmit && npx eslint . && echo "web: clean"); fi
 if [[ "${1:-}" == "--agent" ]]; then uv run pytest -q -m agent tests/test_agent.py; fi
