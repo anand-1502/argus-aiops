@@ -95,29 +95,9 @@ retrieval chain over 30 golden incidents loaded into an empty database, and a ch
 check fails if the agent, retrieval, MCP-server or runbook code changed since the last eval run, because CI cannot run
 the local model. The author re-runs `python -m eval.run_eval` and commits the result with the change.
 
-## Which role does each part show?
 
-| Role | What to look at | Real files |
-| --- | --- | --- |
-| **Data analyst** | A SQL layer in dbt with a star schema, window functions (running totals, moving average, lag, z-score, ntile, ranking), gaps-and-islands, an Analytics page with "show the SQL", and Tableau and Power BI exports with suggested visuals | `dbt/argus/`, `web/app/analytics`, `bi/` |
-| **Business analyst** | A KPI dictionary, business requirements with user stories traced to tests, and a Business impact page whose savings come from assumptions you control, with a break-even point | `docs/KPI_DICTIONARY.md`, `docs/BUSINESS_REQUIREMENTS.md`, `web/app/business` |
-| **Analytics / data engineer** | PySpark parsing of 11M lines, an idempotent loader, 44 dbt tests including reconciliation against the source, measured SQL tuning. A Kafka producer/consumer is verified end to end (50,000 real log lines through a broker into Postgres, nothing lost). The Airflow retrain DAG is verified end to end (trigger, poll, retrain, promotion gate, drift check); the nightly eval DAG imports cleanly but has not been run | `ingest/`, `airflow/`, `dbt/argus/tests/`, `docs/SQL_PERFORMANCE.md` |
-| **Data scientist** | Bootstrap confidence intervals, calibration, exact SHAP, a paired significance test against baselines, error analysis, drift analysis that found a real data shift | `ml/analysis.py`, `ml/drift.py`, Model page |
-| **Machine learning engineer** | MLflow registry with a promotion gate, a serving endpoint with a train/serve parity test and measured latency (p50 14 ms, p99 19 ms), drift alerts, CI gates. An Airflow DAG retrains nightly and was run end to end (about 85 s, promoted through the gate) | `ml/promote.py`, `api/serving.py`, `tests/test_serving.py`, `eval/gate.py` |
-| **AI engineer** | A LangGraph agent with retrieval and reranking over governed MCP tools, citation verification, a golden set, DeepEval and RAGAS, Phoenix tracing | `agent/`, `mcp_servers/`, `kb/`, `eval/` |
-| **Forward-deployed engineer** | One Helm release per client with its own taxonomy, tool allow-list, row cap and runbooks, Terraform for a local cluster, and an onboarding playbook | `deploy/`, `docs/CUSTOMER_ONBOARDING.md` |
+## Limitations
 
-## Honest limitations
-
-- **The logs are from 2008.** HDFS_v1 is still the standard benchmark, which is why scores can be compared with papers,
-  but it does not reflect modern systems.
-- **The runbooks are authored, not official.** I wrote them from general Hadoop knowledge, so a perfect retrieval score
-  mostly shows the plumbing works. They should be reviewed by someone who runs Hadoop.
-- **Citation checks prove evidence exists, not that every claim follows from it.** The groundedness judges try to cover
-  that gap, but a 4B local judge is noisy, and RAGAS often cannot follow its prompts on a model that small (it is recorded
-  as best-effort, with failures counted).
-- **Only the first six incidents were used to tune the agent.** The other 24 golden incidents were never seen during
-  development, and are reported separately.
 - **The metrics service is simulated.** Error-style metrics are derived from real log counts, and CPU, disk and RPC
   latency are simulated with a fixed seed. Each row says which.
 - **The alert-reduction number is sensitive to one parameter.** Incident windows range from 9,830 (1 second gap) to 18 (5 minute gap).
