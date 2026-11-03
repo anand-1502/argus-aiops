@@ -1,0 +1,1 @@
+{"total_events":11175629.0,"total_blocks":575061,"anomalous_blocks":16838,"anomaly_rate_pct":2.93,"incident_windows":145,"anomalous_blocks_per_window":116.1,"alert_reduction_pct":99.1,"median_blocks_per_window":8.0,"p95_blocks_per_window":622.7999999999997,"largest_window_blocks":2270,"worst_hour":"2008-11-11T07:00:00+00:00"}

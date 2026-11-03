@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* the parts the browser draws itself, themed to match the page */
+::selection { background: #0369a1; color: #fff; }
+:focus-visible { outline: 2px solid #38bdf8; outline-offset: 2px; }
+input, select, textarea { accent-color: #38bdf8; caret-color: #38bdf8; }
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}

@@ -1,0 +1,1 @@
+{"model":"stg_events","layer":"staging","sql":"-- One typed row per log line. A view: it adds no storage, and downstream tables do the heavy work once.\nselect\n    ts,\n    date_trunc('hour', ts)            as hour_ts,\n    pid,\n    level,\n    component,\n    nullif(block_id, '')              as block_id,\n    content,\n    template\nfrom {{ source('argus', 'events') }}\n"}
