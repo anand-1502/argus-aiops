@@ -1,0 +1,10 @@
+.venv
+data
+web
+mlruns
+mlflow.db
+exports
+logs
+.git
+__pycache__
+eval/results

@@ -1,0 +1,47 @@
+[project]
+name = "argus"
+version = "0.1.0"
+description = "MCP-native AIOps incident intelligence platform"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "pyspark==3.5.3",
+    "psycopg[binary]>=3.2",
+    "fastapi>=0.162.0",
+    "uvicorn[standard]>=0.54.0",
+    "httpx>=0.28.1",
+    "xgboost>=3.2.0",
+    "scikit-learn>=1.7.2",
+    "pandas>=2.3.3",
+    "mlflow>=3.17.2",
+    "matplotlib>=3.10.9",
+    "mcp[cli]>=1.30.0",
+    "langgraph>=1.2.17",
+    "langchain-ollama>=1.1.0",
+    "langchain-mcp-adapters>=0.3.2",
+    "qdrant-client>=1.20.0",
+    "sentence-transformers>=6.2.0",
+    "strawberry-graphql[fastapi]>=0.334.4",
+    "faiss-cpu>=1.15.1",
+    "ragas>=0.3,<0.4",
+    "deepeval>=4.3.1",
+    "arize-phoenix-otel>=0.17.1",
+    "openinference-instrumentation-langchain>=0.1.80",
+    "pyarrow>=25.0.1",
+    "langchain-community>=0.3,<0.4",
+    "confluent-kafka>=2.16.1",
+    "tableauhyperapi==0.0.26479",
+    "drain3>=0.9.1",
+    "python-multipart>=0.0.32",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "agent: runs the LLM agent end to end (slow; needs Ollama, Postgres, Qdrant)",
+    "torch: loads torch in-process; cannot share a process with xgboost on macOS",
+]
+addopts = "-m 'not agent and not torch'"
