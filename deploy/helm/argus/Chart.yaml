@@ -1,0 +1,6 @@
+apiVersion: v2
+name: argus
+description: Argus incident intelligence, deployed per client with its own taxonomy, MCP limits and runbooks
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

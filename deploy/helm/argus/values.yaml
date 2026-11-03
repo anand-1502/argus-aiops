@@ -1,0 +1,19 @@
+# One release per client. Everything that differs between clients lives here.
+tenant: default            # client name shown by the API and the UI
+kb: acme                   # which runbook set to ship: a folder under kbs/
+taxonomy: {}               # HDFS component -> the client's own grouping
+mcp:
+  maxRows: 200             # row cap enforced by every MCP tool
+  allowedTools: ""         # comma-separated tool names this client gets; empty means all
+images:
+  api: argus-api:dev
+  web: argus-web:dev
+postgres:
+  image: postgres:16-alpine
+  password: argus
+resources:
+  api: {requests: {memory: 128Mi}, limits: {memory: 384Mi}}
+  web: {requests: {memory: 96Mi}, limits: {memory: 256Mi}}
+  postgres: {requests: {memory: 96Mi}, limits: {memory: 256Mi}}
+
+webNodePort: 30080   # set per release so three clients can run side by side

@@ -1,0 +1,12 @@
+tenant: Initech Data
+kb: initech
+taxonomy:
+  dfs.FSNamesystem: Control
+  dfs.DataNode$DataXceiver: Data path
+  dfs.DataNode$PacketResponder: Data path
+  dfs.FSDataset: Data path
+  dfs.DataBlockScanner: Background
+mcp:
+  maxRows: 50
+  allowedTools: "get_block_events,get_block_label,get_unusual_events,get_metric,list_metrics,search_runbooks"
+webNodePort: 30083

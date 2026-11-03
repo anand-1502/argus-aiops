@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "argus.name" . }}-seed
+  labels: {{- include "argus.labels" . | nindent 4 }}
+spec:
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: seed
+          image: {{ .Values.images.api }}
+          imagePullPolicy: IfNotPresent
+          command: ["python", "-m", "eval.load_fixtures"]
+          env:
+            - {name: PGHOST, value: {{ include "argus.name" . }}-postgres}
+            - {name: PGPORT, value: "5432"}
+            - {name: PGDATABASE, value: argus}
+            - {name: POSTGRES_PASSWORD, value: {{ .Values.postgres.password | quote }}}

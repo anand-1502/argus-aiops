@@ -1,0 +1,12 @@
+tenant: Globex Cloud
+kb: globex
+taxonomy:
+  dfs.FSNamesystem: Namenode team
+  dfs.DataNode$DataXceiver: Datanode team
+  dfs.DataNode$PacketResponder: Datanode team
+  dfs.FSDataset: Datanode team
+  dfs.DataNode$DataTransfer: Replication team
+mcp:
+  maxRows: 100
+  allowedTools: "get_block_events,get_block_label,get_unusual_events,find_anomalous_blocks,list_metrics,get_metric,search_runbooks"
+webNodePort: 30082

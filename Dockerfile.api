@@ -1,0 +1,15 @@
+# API image for the Kubernetes demo: the read-only endpoints (stats, GraphQL, tenant, fixtures loader).
+# The agent and model endpoints need the full local stack and are not part of this image.
+FROM python:3.12-slim
+WORKDIR /app
+RUN pip install --no-cache-dir "fastapi>=0.110" "uvicorn[standard]" "psycopg[binary]>=3.2" "strawberry-graphql[fastapi]" "pandas" "python-multipart" "drain3"
+COPY api ./api
+COPY ml/baselines.py ml/__init__.py ./ml/
+COPY infra ./infra
+COPY eval/load_fixtures.py eval/__init__.py ./eval/
+COPY eval/fixtures ./eval/fixtures
+COPY ingest/__init__.py ingest/load.py ingest/upload.py ./ingest/
+COPY agent/incidents.json ./agent/incidents.json
+ENV PYTHONUNBUFFERED=1
+EXPOSE 8000
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

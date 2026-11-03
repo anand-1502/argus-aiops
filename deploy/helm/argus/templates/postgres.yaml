@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "argus.name" . }}-postgres
+  labels: {{- include "argus.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: {{ include "argus.name" . }}-postgres}}
+  template:
+    metadata:
+      labels: {app: {{ include "argus.name" . }}-postgres}
+    spec:
+      containers:
+        - name: postgres
+          image: {{ .Values.postgres.image }}
+          env:
+            - {name: POSTGRES_USER, value: argus}
+            - {name: POSTGRES_PASSWORD, value: {{ .Values.postgres.password | quote }}}
+            - {name: POSTGRES_DB, value: argus}
+          ports: [{containerPort: 5432}]
+          readinessProbe: {exec: {command: ["pg_isready", "-U", "argus"]}, periodSeconds: 3}
+          resources: {{- toYaml .Values.resources.postgres | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "argus.name" . }}-postgres
+spec:
+  selector: {app: {{ include "argus.name" . }}-postgres}
+  ports: [{port: 5432}]

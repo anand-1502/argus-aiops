@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "argus.name" . }}-web
+  labels: {{- include "argus.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: {{ include "argus.name" . }}-web}}
+  template:
+    metadata:
+      labels: {app: {{ include "argus.name" . }}-web}
+    spec:
+      containers:
+        - name: web
+          image: {{ .Values.images.web }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - {name: API_INTERNAL_URL, value: "http://{{ include "argus.name" . }}-api:8000"}
+          ports: [{containerPort: 3000}]
+          readinessProbe: {httpGet: {path: /, port: 3000}, periodSeconds: 5, failureThreshold: 20}
+          resources: {{- toYaml .Values.resources.web | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "argus.name" . }}-web
+spec:
+  type: NodePort
+  selector: {app: {{ include "argus.name" . }}-web}
+  ports: [{port: 3000, targetPort: 3000, nodePort: {{ .Values.webNodePort }}}]

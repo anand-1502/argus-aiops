@@ -1,0 +1,12 @@
+tenant: Acme Storage
+kb: acme
+taxonomy:
+  dfs.FSNamesystem: Metadata plane
+  dfs.FSDataset: Storage plane
+  dfs.DataNode$DataXceiver: Storage plane
+  dfs.DataNode$PacketResponder: Storage plane
+  dfs.DataBlockScanner: Housekeeping
+mcp:
+  maxRows: 200
+  allowedTools: ""
+webNodePort: 30081

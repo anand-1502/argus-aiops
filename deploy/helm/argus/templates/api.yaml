@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "argus.name" . }}-api
+  labels: {{- include "argus.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: {{ include "argus.name" . }}-api}}
+  template:
+    metadata:
+      labels: {app: {{ include "argus.name" . }}-api}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      containers:
+        - name: api
+          image: {{ .Values.images.api }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - {name: PGHOST, value: {{ include "argus.name" . }}-postgres}
+            - {name: PGPORT, value: "5432"}
+            - {name: PGDATABASE, value: argus}
+            - {name: POSTGRES_PASSWORD, value: {{ .Values.postgres.password | quote }}}
+            - {name: ARGUS_TENANT, value: {{ .Values.tenant | quote }}}
+            - {name: ARGUS_TAXONOMY_FILE, value: /config/taxonomy.json}
+            - {name: ARGUS_MAX_ROWS, value: {{ .Values.mcp.maxRows | quote }}}
+            - {name: ARGUS_ALLOWED_TOOLS, value: {{ .Values.mcp.allowedTools | quote }}}
+            - {name: ARGUS_RUNBOOK_DIR, value: /runbooks}
+          ports: [{containerPort: 8000}]
+          readinessProbe: {httpGet: {path: /health, port: 8000}, periodSeconds: 5, failureThreshold: 20}
+          volumeMounts:
+            - {name: config, mountPath: /config}
+            - {name: runbooks, mountPath: /runbooks}
+          resources: {{- toYaml .Values.resources.api | nindent 12 }}
+      volumes:
+        - {name: config, configMap: {name: {{ include "argus.name" . }}-config}}
+        - {name: runbooks, configMap: {name: {{ include "argus.name" . }}-runbooks}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "argus.name" . }}-api
+spec:
+  selector: {app: {{ include "argus.name" . }}-api}
+  ports: [{port: 8000}]
